@@ -2,12 +2,13 @@
 //  AddCollectionView.swift
 //  TinyThoughts
 //
-//  Created for MVVM refactoring
+//  View for adding a new collection
 //
 
 import SwiftUI
 
 struct AddCollectionView: View {
+    
     @ObservedObject var viewModel: CollectionViewModel
     @State private var name: String = ""
     @State private var summary: String = ""

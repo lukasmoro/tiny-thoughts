@@ -2,7 +2,7 @@
 //  CollectionView.swift
 //  TinyThoughts
 //
-//  Created for MVVM refactoring
+//  View for displaying a collection
 //
 
 import SwiftUI
@@ -26,20 +26,12 @@ struct CollectionView: View {
             }
             
             HStack {
-                Text("Created:")
-                    .font(.caption2)
-                    .foregroundColor(.gray)
-                Text(collection.creationDate ?? Date(), formatter: formatter)
-                    .font(.caption2)
-                    .foregroundColor(.gray)
-                
-                Spacer()
-                
                 if let threads = collection.threads?.allObjects as? [Thread] {
                     Text("\(threads.count) thread\(threads.count == 1 ? "" : "s")")
                         .font(.caption)
                         .foregroundColor(.blue)
                 }
+                Spacer()
             }
         }
         .padding()

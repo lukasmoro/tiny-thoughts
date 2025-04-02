@@ -2,17 +2,16 @@
 //  AddThreadView.swift
 //  TinyThoughts
 //
-//  Created for MVVM refactoring
+//  View for adding a new thread
 //
 
 import SwiftUI
 
 struct AddThreadView: View {
     @ObservedObject var viewModel: ThreadViewModel
-    let collection: Collection
-    
     @State private var title: String = ""
     @State private var summary: String = ""
+    let collection: Collection
     @Environment(\.dismiss) private var dismiss
     
     var body: some View {
@@ -23,12 +22,6 @@ struct AddThreadView: View {
                     
                     TextField("Summary (optional)", text: $summary, axis: .vertical)
                         .lineLimit(3...5)
-                }
-                
-                Section {
-                    Text("This thread will be added to: \(collection.name ?? "Unnamed Collection")")
-                        .font(.caption)
-                        .foregroundColor(.secondary)
                 }
             }
             .navigationTitle("New Thread")

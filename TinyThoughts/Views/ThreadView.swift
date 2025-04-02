@@ -2,7 +2,7 @@
 //  ThreadView.swift
 //  TinyThoughts
 //
-//  Created for MVVM refactoring
+//  View for displaying a thread, left column
 //
 
 import SwiftUI
@@ -26,20 +26,12 @@ struct ThreadView: View {
             }
             
             HStack {
-                Text("Modified:")
-                    .font(.caption2)
-                    .foregroundColor(.gray)
-                Text(thread.lastModified ?? Date(), formatter: formatter)
-                    .font(.caption2)
-                    .foregroundColor(.gray)
-                
-                Spacer()
-                
                 if let thoughts = thread.thoughts?.allObjects as? [Thought] {
                     Text("\(thoughts.count) thought\(thoughts.count == 1 ? "" : "s")")
                         .font(.caption)
                         .foregroundColor(.blue)
                 }
+                Spacer()
             }
         }
         .padding()

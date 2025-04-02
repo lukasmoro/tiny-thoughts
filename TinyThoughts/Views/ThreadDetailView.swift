@@ -2,7 +2,7 @@
 //  ThreadDetailView.swift
 //  TinyThoughts
 //
-//  Created for MVVM refactoring
+//  View for displaying and editing a thread
 //
 
 import SwiftUI
@@ -28,7 +28,6 @@ struct ThreadDetailView: View {
     
     var body: some View {
         VStack(spacing: 0) {
-            // Thread info
             VStack(alignment: .leading, spacing: 10) {
                 if isEditing {
                     TextField("Thread Title", text: $editedTitle)
@@ -49,30 +48,12 @@ struct ThreadDetailView: View {
                             .foregroundColor(.secondary)
                     }
                 }
-                
-                HStack {
-                    Text("Created:")
-                        .font(.caption)
-                    Text(thread.creationDate ?? Date(), formatter: formatter)
-                        .font(.caption)
-                    
-                    Spacer()
-                    
-                    if let lastModified = thread.lastModified, lastModified != thread.creationDate {
-                        Text("Last modified:")
-                            .font(.caption)
-                        Text(lastModified, formatter: formatter)
-                            .font(.caption)
-                    }
-                }
-                .foregroundColor(.gray)
             }
             .padding()
             .background(Color(.systemBackground))
             
             Divider()
             
-            // Thoughts list
             if thoughtViewModel.thoughts.isEmpty {
                 VStack(spacing: 20) {
                     Spacer()
@@ -101,7 +82,7 @@ struct ThreadDetailView: View {
                         NavigationLink {
                             ThoughtDetailView(viewModel: thoughtViewModel, thought: thought, formatter: formatter)
                         } label: {
-                            ThoughtView(thought: thought, formatter: formatter)
+                            ThoughtView(thought: thought)
                         }
                     }
                     .onDelete(perform: thoughtViewModel.deleteThoughts)

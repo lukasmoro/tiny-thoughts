@@ -14,9 +14,8 @@ struct ContentView: View {
     @State private var showingAddCollection = false
     
     init() {
-        // Initialize with a temporary context that will be replaced
-        let context = PersistenceController.preview.container.viewContext
-        _collectionViewModel = StateObject(wrappedValue: CollectionViewModel(viewContext: context))
+        // Initialize with a dummy context that will be replaced in onAppear
+        _collectionViewModel = StateObject(wrappedValue: CollectionViewModel(viewContext: PersistenceController.shared.container.viewContext))
     }
     
     private let dateFormatter: DateFormatter = {

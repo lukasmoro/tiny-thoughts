@@ -2,7 +2,7 @@
 //  ThoughtDetailView.swift
 //  TinyThoughts
 //
-//  Created for MVVM refactoring
+//  View for displaying and editing a thought
 //
 
 import SwiftUI
@@ -28,29 +28,6 @@ struct ThoughtDetailView: View {
                         .font(.body)
                         .padding()
                 }
-                
-                VStack(alignment: .leading, spacing: 8) {
-                    HStack {
-                        Text("Created:")
-                            .font(.caption)
-                            .foregroundColor(.gray)
-                        Text(thought.creationDate ?? Date(), formatter: formatter)
-                            .font(.caption)
-                            .foregroundColor(.gray)
-                    }
-                    
-                    if let modified = thought.lastModified, modified != thought.creationDate {
-                        HStack {
-                            Text("Modified:")
-                                .font(.caption)
-                                .foregroundColor(.gray)
-                            Text(modified, formatter: formatter)
-                                .font(.caption)
-                                .foregroundColor(.gray)
-                        }
-                    }
-                }
-                .padding(.horizontal)
             }
         }
         .navigationTitle("Thought Details")
