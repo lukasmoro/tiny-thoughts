@@ -13,14 +13,14 @@ struct ContentView: View {
     @StateObject private var collectionViewModel: CollectionViewModel
     @State private var showingAddCollection = false
     
+    // dummy content for testing
     init() {
-        // Initialize with a dummy context that will be replaced in onAppear
         _collectionViewModel = StateObject(wrappedValue: CollectionViewModel(viewContext: PersistenceController.shared.container.viewContext))
     }
     
     private let dateFormatter: DateFormatter = {
         let formatter = DateFormatter()
-        formatter.dateStyle = .medium
+        formatter.dateStyle = .short
         formatter.timeStyle = .short
         return formatter
     }()

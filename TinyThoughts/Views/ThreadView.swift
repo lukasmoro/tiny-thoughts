@@ -35,7 +35,10 @@ struct ThreadView: View {
             }
         }
         .padding()
-        .background(Color(.systemGray5))
-        .cornerRadius(10)
+        .clipShape(RoundedRectangle(cornerRadius: 10))
+        .background(
+            RoundedRectangle(cornerRadius: 10)
+                .fill(Color(.systemGray5))
+        )
     }
 } 

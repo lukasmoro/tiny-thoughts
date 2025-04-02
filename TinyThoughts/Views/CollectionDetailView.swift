@@ -112,19 +112,19 @@ struct CollectionDetailView: View {
             }
             
             HStack {
-                Text("Created:")
-                    .font(.caption)
-                Text(collection.creationDate ?? Date(), formatter: formatter)
-                    .font(.caption)
-                
-                Spacer()
-                
                 if let lastModified = collection.lastModified, lastModified != collection.creationDate {
                     Text("Last modified:")
                         .font(.caption)
                     Text(lastModified, formatter: formatter)
                         .font(.caption)
+                } else {
+                    Text("Created:")
+                        .font(.caption)
+                    Text(collection.creationDate ?? Date(), formatter: formatter)
+                        .font(.caption)
                 }
+                
+                Spacer()
             }
             .foregroundColor(.gray)
         }
@@ -153,10 +153,12 @@ struct CollectionDetailView: View {
                             // Update thought view model with the selected thread
                             thoughtViewModel.setThread(thread)
                         }
-                        .background(
-                            selectedThread?.id == thread.id ? 
-                            Color(.systemGray4).opacity(0.5) : 
-                            Color.clear
+                        .overlay(
+                            RoundedRectangle(cornerRadius: 10)
+                                .stroke(selectedThread?.id == thread.id ? 
+                                     Color.blue.opacity(0.8) : 
+                                     Color.clear, 
+                                     lineWidth: 2)
                         )
                 }
                 .onDelete(perform: threadViewModel.deleteThreads)
@@ -213,19 +215,19 @@ struct CollectionDetailView: View {
             }
             
             HStack {
-                Text("Created:")
-                    .font(.caption)
-                Text(thread.creationDate ?? Date(), formatter: formatter)
-                    .font(.caption)
-                
-                Spacer()
-                
                 if let lastModified = thread.lastModified, lastModified != thread.creationDate {
                     Text("Last modified:")
                         .font(.caption)
                     Text(lastModified, formatter: formatter)
                         .font(.caption)
+                } else {
+                    Text("Created:")
+                        .font(.caption)
+                    Text(thread.creationDate ?? Date(), formatter: formatter)
+                        .font(.caption)
                 }
+                
+                Spacer()
             }
             .foregroundColor(.gray)
         }
