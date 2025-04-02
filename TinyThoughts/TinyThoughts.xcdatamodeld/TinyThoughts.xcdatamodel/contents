@@ -1,9 +1,42 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<model type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="1" systemVersion="11A491" minimumToolsVersion="Automatic" sourceLanguage="Swift" usedWithCloudKit="false" userDefinedModelVersionIdentifier="">
+<model type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="23605" systemVersion="24D81" minimumToolsVersion="Automatic" sourceLanguage="Swift" userDefinedModelVersionIdentifier="">
+    <entity name="Collection" representedClassName="Collection" syncable="YES" codeGenerationType="class">
+        <attribute name="creationDate" attributeType="Date" usesScalarValueType="NO"/>
+        <attribute name="id" attributeType="UUID" usesScalarValueType="NO"/>
+        <attribute name="lastModified" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
+        <attribute name="name" attributeType="String"/>
+        <attribute name="summary" optional="YES" attributeType="String"/>
+        <relationship name="threads" optional="YES" toMany="YES" deletionRule="Cascade" destinationEntity="Thread" inverseName="collection" inverseEntity="Thread"/>
+    </entity>
     <entity name="Item" representedClassName="Item" syncable="YES" codeGenerationType="class">
         <attribute name="timestamp" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
     </entity>
-    <elements>
-        <element name="Item" positionX="-63" positionY="-18" width="128" height="44"/>
-    </elements>
+    <entity name="Tag" representedClassName="Tag" syncable="YES" codeGenerationType="class">
+        <attribute name="id" attributeType="UUID" usesScalarValueType="NO"/>
+        <attribute name="name" attributeType="String"/>
+        <relationship name="thoughtTagRelations" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="ThoughtTagRelation" inverseName="tag" inverseEntity="ThoughtTagRelation"/>
+    </entity>
+    <entity name="Thought" representedClassName="Thought" syncable="YES" codeGenerationType="class">
+        <attribute name="content" optional="YES" attributeType="String"/>
+        <attribute name="creationDate" attributeType="Date" usesScalarValueType="NO"/>
+        <attribute name="id" attributeType="UUID" usesScalarValueType="NO"/>
+        <attribute name="lastModified" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
+        <attribute name="position" optional="YES" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES"/>
+        <relationship name="thoughtTagRelations" optional="YES" toMany="YES" deletionRule="Cascade" destinationEntity="ThoughtTagRelation" inverseName="thought" inverseEntity="ThoughtTagRelation"/>
+        <relationship name="thread" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Thread" inverseName="thoughts" inverseEntity="Thread"/>
+    </entity>
+    <entity name="ThoughtTagRelation" representedClassName="ThoughtTagRelation" syncable="YES" codeGenerationType="class">
+        <attribute name="id" attributeType="UUID" usesScalarValueType="NO"/>
+        <relationship name="tag" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Tag" inverseName="thoughtTagRelations" inverseEntity="Tag"/>
+        <relationship name="thought" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Thought" inverseName="thoughtTagRelations" inverseEntity="Thought"/>
+    </entity>
+    <entity name="Thread" representedClassName="Thread" syncable="YES" codeGenerationType="class">
+        <attribute name="creationDate" attributeType="Date" usesScalarValueType="NO"/>
+        <attribute name="id" attributeType="UUID" usesScalarValueType="NO"/>
+        <attribute name="lastModified" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
+        <attribute name="summary" optional="YES" attributeType="String"/>
+        <attribute name="title" optional="YES" attributeType="String"/>
+        <relationship name="collection" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Collection" inverseName="threads" inverseEntity="Collection"/>
+        <relationship name="thoughts" optional="YES" toMany="YES" deletionRule="Cascade" destinationEntity="Thought" inverseName="thread" inverseEntity="Thought"/>
+    </entity>
 </model>
