@@ -10,77 +10,77 @@ import CoreData
 
 struct ContentView: View {
     @Environment(\.managedObjectContext) private var viewContext
-
-    @FetchRequest(
-        sortDescriptors: [NSSortDescriptor(keyPath: \Item.timestamp, ascending: true)],
-        animation: .default)
-    private var items: FetchedResults<Item>
-
+    @StateObject private var collectionViewModel: CollectionViewModel
+    @State private var showingAddCollection = false
+    
+    init() {
+        // Initialize with a temporary context that will be replaced
+        let context = PersistenceController.preview.container.viewContext
+        _collectionViewModel = StateObject(wrappedValue: CollectionViewModel(viewContext: context))
+    }
+    
+    private let dateFormatter: DateFormatter = {
+        let formatter = DateFormatter()
+        formatter.dateStyle = .medium
+        formatter.timeStyle = .short
+        return formatter
+    }()
+    
     var body: some View {
         NavigationView {
             List {
-                ForEach(items) { item in
+                ForEach(collectionViewModel.collections, id: \.id) { collection in
                     NavigationLink {
-                        Text("Item at \(item.timestamp!, formatter: itemFormatter)")
+                        CollectionDetailView(
+                            viewContext: viewContext,
+                            collectionViewModel: collectionViewModel,
+                            collection: collection,
+                            formatter: dateFormatter
+                        )
                     } label: {
-                        Text(item.timestamp!, formatter: itemFormatter)
+                        CollectionView(collection: collection, formatter: dateFormatter)
                     }
                 }
-                .onDelete(perform: deleteItems)
+                .onDelete(perform: collectionViewModel.deleteCollections)
             }
+            .navigationTitle("Tiny Thoughts")
             .toolbar {
-                ToolbarItem(placement: .navigationBarTrailing) {
+                ToolbarItem(placement: .navigationBarLeading) {
                     EditButton()
                 }
-                ToolbarItem {
-                    Button(action: addItem) {
-                        Label("Add Item", systemImage: "plus")
+                ToolbarItem(placement: .navigationBarTrailing) {
+                    Button(action: { showingAddCollection = true }) {
+                        Label("Add Collection", systemImage: "plus")
                     }
                 }
             }
-            Text("Select an item")
-        }
-    }
-
-    private func addItem() {
-        withAnimation {
-            let newItem = Item(context: viewContext)
-            newItem.timestamp = Date()
-
-            do {
-                try viewContext.save()
-            } catch {
-                // Replace this implementation with code to handle the error appropriately.
-                // fatalError() causes the application to generate a crash log and terminate. You should not use this function in a shipping application, although it may be useful during development.
-                let nsError = error as NSError
-                fatalError("Unresolved error \(nsError), \(nsError.userInfo)")
+            
+            // Secondary view when no collection is selected
+            VStack {
+                Image(systemName: "folder.fill")
+                    .font(.system(size: 60))
+                    .foregroundColor(.blue)
+                    .padding()
+                
+                Text("Select a Collection")
+                    .font(.title)
+                
+                Text("Or create a new one using the + button")
+                    .font(.subheadline)
+                    .foregroundColor(.gray)
             }
         }
-    }
-
-    private func deleteItems(offsets: IndexSet) {
-        withAnimation {
-            offsets.map { items[$0] }.forEach(viewContext.delete)
-
-            do {
-                try viewContext.save()
-            } catch {
-                // Replace this implementation with code to handle the error appropriately.
-                // fatalError() causes the application to generate a crash log and terminate. You should not use this function in a shipping application, although it may be useful during development.
-                let nsError = error as NSError
-                fatalError("Unresolved error \(nsError), \(nsError.userInfo)")
-            }
+        .sheet(isPresented: $showingAddCollection) {
+            AddCollectionView(viewModel: collectionViewModel)
+        }
+        .onAppear {
+            // Replace the preview context with the actual context from the environment
+            collectionViewModel.updateContext(viewContext)
         }
     }
 }
-
-private let itemFormatter: DateFormatter = {
-    let formatter = DateFormatter()
-    formatter.dateStyle = .short
-    formatter.timeStyle = .medium
-    return formatter
-}()
 
 #Preview {
     ContentView().environment(\.managedObjectContext, PersistenceController.preview.container.viewContext)
 }
+
