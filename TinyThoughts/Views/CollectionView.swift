@@ -12,7 +12,7 @@ struct CollectionView: View {
     let formatter: DateFormatter
     
     var body: some View {
-        VStack(alignment: .leading, spacing: 8) {
+        VStack(alignment: .leading) {
             Text(collection.name ?? "Unnamed Collection")
                 .font(.headline)
                 .padding(.bottom, 2)
@@ -34,8 +34,6 @@ struct CollectionView: View {
                 Spacer()
             }
         }
-        .padding()
-        .background(Color(.systemGray6))
-        .cornerRadius(10)
+        .padding(5)
     }
 } 

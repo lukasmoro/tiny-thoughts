@@ -2,7 +2,7 @@
 //  AddCollectionView.swift
 //  TinyThoughts
 //
-//  View for adding a new collection
+//  View for adding a new collection (when pressing the + button in the CollectionView)
 //
 
 import SwiftUI
@@ -19,9 +19,7 @@ struct AddCollectionView: View {
             Form {
                 Section(header: Text("Collection Details")) {
                     TextField("Collection Name", text: $name)
-                    
                     TextField("Summary (optional)", text: $summary, axis: .vertical)
-                        .lineLimit(3...5)
                 }
             }
             .navigationTitle("New Collection")

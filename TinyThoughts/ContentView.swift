@@ -72,6 +72,12 @@ struct ContentView: View {
         .sheet(isPresented: $showingAddCollection) {
             AddCollectionView(viewModel: collectionViewModel)
         }
+        .onChange(of: showingAddCollection) { oldValue, newValue in
+            if !newValue {
+                // Collection add sheet was dismissed, refresh collections
+                collectionViewModel.fetchCollections()
+            }
+        }
         .onAppear {
             // Replace the preview context with the actual context from the environment
             collectionViewModel.updateContext(viewContext)

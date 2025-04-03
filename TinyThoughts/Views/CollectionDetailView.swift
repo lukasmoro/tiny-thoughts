@@ -9,21 +9,35 @@ import SwiftUI
 import CoreData
 
 struct CollectionDetailView: View {
+   
+    // MARK: - View Models
     @ObservedObject var collectionViewModel: CollectionViewModel
     @StateObject private var threadViewModel: ThreadViewModel
+    @StateObject private var thoughtViewModel: ThoughtViewModel
+
+    // MARK: - Data Models
     let collection: Collection
     let formatter: DateFormatter
     @Environment(\.managedObjectContext) private var viewContext
-    @State private var showingAddThread = false
-    @State private var isEditing = false
-    @State private var editedName: String = ""
-    @State private var editedSummary: String = ""
+
+    // MARK: - Collection Editing State
+    struct EditingState {
+        var isEditing: Bool = false
+        var name: String = ""
+        var summary: String = ""
+    }
+
+    @State private var collectionEditState = EditingState()
+    @State private var threadEditState = EditingState()
+
+    // MARK: - Thread State
     @State private var selectedThread: Thread? = nil
-    @StateObject private var thoughtViewModel: ThoughtViewModel
-    @State private var showingAddThought = false
-    @State private var isEditingThread = false
+    @State private var showingAddThread = false
     @State private var editedThreadTitle: String = ""
     @State private var editedThreadSummary: String = ""
+
+    // MARK: - Thought State
+    @State private var showingAddThought = false
     
     init(viewContext: NSManagedObjectContext, collectionViewModel: CollectionViewModel, collection: Collection, formatter: DateFormatter) {
         self.collectionViewModel = collectionViewModel
@@ -39,51 +53,40 @@ struct CollectionDetailView: View {
             Divider()
             threadContentView
         }
-        .navigationTitle("Collection Details")
-        .navigationBarTitleDisplayMode(.inline)
-        .toolbar {
-            ToolbarItem(placement: .navigationBarTrailing) {
-                if isEditing {
-                    Button("Save") {
-                        if !editedName.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
-                            collectionViewModel.updateCollection(
-                                collection,
-                                name: editedName,
-                                summary: editedSummary.isEmpty ? nil : editedSummary
-                            )
-                            isEditing = false
-                        }
-                    }
-                    .disabled(editedName.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
-                } else {
-                    Button("Edit") {
-                        editedName = collection.name ?? ""
-                        editedSummary = collection.summary ?? ""
-                        isEditing = true
-                    }
-                }
-            }
-            
-            ToolbarItem(placement: .navigationBarTrailing) {
-                Button(action: { showingAddThread = true }) {
-                    Label("Add Thread", systemImage: "plus")
-                }
-            }
-        }
         .sheet(isPresented: $showingAddThread) {
             AddThreadView(viewModel: threadViewModel, collection: collection)
+        }
+        .onChange(of: showingAddThread) { oldValue, newValue in
+            if !newValue {
+                threadViewModel.fetchThreads()
+            }
         }
         .sheet(isPresented: $showingAddThought) {
             if let thread = selectedThread {
                 AddThoughtView(viewModel: ThoughtViewModel(viewContext: viewContext, thread: thread))
             }
         }
+        .onChange(of: showingAddThought) { oldValue, newValue in
+            if !newValue && selectedThread != nil {
+                thoughtViewModel.fetchThoughts()
+            }
+        }
+        .onChange(of: collectionEditState.isEditing) { oldValue, newValue in
+            if !newValue {
+                collectionViewModel.fetchCollections()
+            }
+        }
         .onAppear {
             threadViewModel.fetchThreads()
-            // Select the first thread by default if available
             if let firstThread = threadViewModel.threads.first, selectedThread == nil {
                 selectedThread = firstThread
                 thoughtViewModel.setThread(firstThread)
+            }
+        }
+        .onChange(of: threadEditState.isEditing) { oldValue, newValue in
+            if !newValue && selectedThread != nil {
+                threadViewModel.fetchThreads()
+                thoughtViewModel.fetchThoughts()
             }
         }
     }
@@ -91,19 +94,45 @@ struct CollectionDetailView: View {
     // MARK: - Header View
     private var collectionHeaderView: some View {
         VStack(alignment: .leading, spacing: 10) {
-            if isEditing {
-                TextField("Collection Name", text: $editedName)
-                    .font(.title)
-                    .padding(.bottom, 5)
-                
-                TextField("Summary", text: $editedSummary, axis: .vertical)
+            HStack {
+                if collectionEditState.isEditing {
+                    TextField("Collection Name", text: $collectionEditState.name)
+                        .font(.title)
+                        .padding(.bottom, 5)
+                } else {
+                    Text(collection.name ?? "Unnamed Collection")
+                        .font(.title)
+                        .bold()
+                        .padding(.bottom, 5)
+                }
+
+                Spacer()
+
+                if collectionEditState.isEditing {
+                    Button("Save") {
+                        if !collectionEditState.name.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+                            collectionViewModel.updateCollection(
+                                collection,
+                                name: collectionEditState.name,
+                                summary: collectionEditState.summary.isEmpty ? nil : collectionEditState.summary
+                            )
+                            collectionEditState.isEditing = false
+                        }
+                    }
+                    .disabled(collectionEditState.name.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
+                } else {
+                    Button("Edit") {
+                        collectionEditState.name = collection.name ?? ""
+                        collectionEditState.summary = collection.summary ?? ""
+                        collectionEditState.isEditing = true
+                    }
+                }
+            }
+            
+            if collectionEditState.isEditing {
+                TextField("Summary", text: $collectionEditState.summary, axis: .vertical)
                     .lineLimit(3...5)
             } else {
-                Text(collection.name ?? "Unnamed Collection")
-                    .font(.title)
-                    .bold()
-                    .padding(.bottom, 5)
-                
                 if let summary = collection.summary, !summary.isEmpty {
                     Text(summary)
                         .font(.subheadline)
@@ -135,7 +164,27 @@ struct CollectionDetailView: View {
     // MARK: - Thread Content View
     private var threadContentView: some View {
         HStack(spacing: 0) {
-            threadListView
+            VStack {
+                HStack {
+                    Text("Threads")
+                        .font(.headline)
+                    Spacer()
+                }
+                .padding(.horizontal)
+                .padding(.top, 8)
+                
+                threadListView
+                
+                Button(action: { showingAddThread = true }) {
+                    Image(systemName: "plus")
+                        .font(.system(size: 20))
+                        .foregroundColor(.blue)
+                }
+                .padding(.vertical, 10)
+                .frame(maxWidth: .infinity)
+                .background(Color(.systemGray6))
+            }
+            .frame(width: UIScreen.main.bounds.width * 0.35)
             Divider()
             threadDetailView
         }
@@ -143,32 +192,29 @@ struct CollectionDetailView: View {
     
     // MARK: - Thread List View
     private var threadListView: some View {
-        VStack {
-            List {
-                ForEach(threadViewModel.threads, id: \.id) { thread in
-                    ThreadView(thread: thread, formatter: formatter)
-                        .contentShape(Rectangle())
-                        .onTapGesture {
-                            selectedThread = thread
-                            // Update thought view model with the selected thread
-                            thoughtViewModel.setThread(thread)
-                        }
-                        .overlay(
-                            RoundedRectangle(cornerRadius: 10)
-                                .stroke(selectedThread?.id == thread.id ? 
-                                     Color.blue.opacity(0.8) : 
-                                     Color.clear, 
-                                     lineWidth: 2)
-                        )
-                }
-                .onDelete(perform: threadViewModel.deleteThreads)
+        List {
+            ForEach(threadViewModel.threads, id: \.id) { thread in
+                ThreadView(thread: thread, formatter: formatter)
+                    .contentShape(Rectangle())
+                    .onTapGesture {
+                        selectedThread = thread
+                        thoughtViewModel.setThread(thread)
+                    }
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 10)
+                            .stroke(selectedThread?.id == thread.id ? 
+                                 Color.blue.opacity(0.8) : 
+                                 Color.clear, 
+                                 lineWidth: 2)
+                    )
+                    .listRowSeparator(.hidden)
             }
-            .listStyle(PlainListStyle())
-            .refreshable {
-                threadViewModel.fetchThreads()
-            }
+            .onDelete(perform: threadViewModel.deleteThreads)
         }
-        .frame(width: UIScreen.main.bounds.width * 0.35)
+        .listStyle(PlainListStyle())
+        .refreshable {
+            threadViewModel.fetchThreads()
+        }
     }
     
     // MARK: - Thread Detail View
@@ -179,7 +225,6 @@ struct CollectionDetailView: View {
                 Divider()
                 thoughtsView(thread: thread)
             } else {
-                // No thread selected
                 VStack {
                     Spacer()
                     Text("Select a thread to view thoughts")
@@ -194,19 +239,49 @@ struct CollectionDetailView: View {
     // MARK: - Thread Header View
     private func threadHeaderView(thread: Thread) -> some View {
         VStack(alignment: .leading, spacing: 10) {
-            if isEditingThread {
-                TextField("Thread Title", text: $editedThreadTitle)
-                    .font(.title2)
-                    .padding(.bottom, 5)
+            HStack {
+                if threadEditState.isEditing {
+                    TextField("Thread Title", text: $editedThreadTitle)
+                        .font(.title2)
+                        .padding(.bottom, 5)
+                } else {
+                    Text(thread.title ?? "Untitled Thread")
+                        .font(.title2)
+                        .bold()
+                        .padding(.bottom, 5)
+                }
                 
+                Spacer()
+                
+                if threadEditState.isEditing {
+                    Button("Save") {
+                        if !editedThreadTitle.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+                            threadViewModel.updateThread(
+                                thread,
+                                title: editedThreadTitle,
+                                summary: editedThreadSummary.isEmpty ? nil : editedThreadSummary
+                            )
+                            threadEditState.isEditing = false
+                        }
+                    }
+                    .disabled(editedThreadTitle.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
+                } else {
+                    Button(action: {
+                        editedThreadTitle = thread.title ?? ""
+                        editedThreadSummary = thread.summary ?? ""
+                        threadEditState.isEditing = true
+                    }) {
+                        Image(systemName: "wrench")
+                            .font(.system(size: 20))
+                            .foregroundColor(.blue)
+                    }
+                }
+            }
+            
+            if threadEditState.isEditing {
                 TextField("Summary", text: $editedThreadSummary, axis: .vertical)
                     .lineLimit(3...5)
             } else {
-                Text(thread.title ?? "Untitled Thread")
-                    .font(.title2)
-                    .bold()
-                    .padding(.bottom, 5)
-                
                 if let summary = thread.summary, !summary.isEmpty {
                     Text(summary)
                         .font(.subheadline)
@@ -233,40 +308,11 @@ struct CollectionDetailView: View {
         }
         .padding()
         .background(Color(.systemBackground))
-        .toolbar {
-            ToolbarItem(placement: .navigationBarTrailing) {
-                if isEditingThread {
-                    Button("Save") {
-                        if !editedThreadTitle.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
-                            threadViewModel.updateThread(
-                                thread,
-                                title: editedThreadTitle,
-                                summary: editedThreadSummary.isEmpty ? nil : editedThreadSummary
-                            )
-                            isEditingThread = false
-                        }
-                    }
-                    .disabled(editedThreadTitle.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
-                } else {
-                    Button("Edit Thread") {
-                        editedThreadTitle = thread.title ?? ""
-                        editedThreadSummary = thread.summary ?? ""
-                        isEditingThread = true
-                    }
-                }
-            }
-            
-            ToolbarItem(placement: .navigationBarTrailing) {
-                Button(action: { showingAddThought = true }) {
-                    Label("Add Thought", systemImage: "plus.circle")
-                }
-            }
-        }
     }
     
     // MARK: - Thoughts View
     private func thoughtsView(thread: Thread) -> some View {
-        Group {
+        VStack {
             if thoughtViewModel.thoughts.isEmpty {
                 VStack(spacing: 20) {
                     Spacer()
@@ -278,13 +324,11 @@ struct CollectionDetailView: View {
                     Text("No thoughts yet")
                         .font(.headline)
                     
-                    Button(action: { showingAddThought = true }) {
-                        Text("Add your first thought")
-                            .padding()
-                            .background(Color.blue)
-                            .foregroundColor(.white)
-                            .cornerRadius(8)
-                    }
+                    Text("Use the + button below to add your first thought")
+                        .font(.subheadline)
+                        .foregroundColor(.secondary)
+                        .multilineTextAlignment(.center)
+                        .padding(.horizontal)
                     
                     Spacer()
                 }
@@ -298,6 +342,15 @@ struct CollectionDetailView: View {
                 }
                 .listStyle(PlainListStyle())
             }
+            
+            Button(action: { showingAddThought = true }) {
+                Image(systemName: "plus")
+                    .font(.system(size: 20))
+                    .foregroundColor(.blue)
+            }
+            .padding(.vertical, 10)
+            .frame(maxWidth: .infinity)
+            .background(Color(.systemGray6))
         }
     }
 } 

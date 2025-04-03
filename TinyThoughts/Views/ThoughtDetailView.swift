@@ -48,6 +48,11 @@ struct ThoughtDetailView: View {
                 }
             }
         }
+        .onChange(of: isEditing) { oldValue, newValue in
+            if !newValue {
+                viewModel.fetchThoughts()
+            }
+        }
         .onAppear {
             editedContent = thought.content ?? ""
         }

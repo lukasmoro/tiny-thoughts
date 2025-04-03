@@ -11,6 +11,7 @@ import CoreData
 struct ThreadDetailView: View {
     @ObservedObject var threadViewModel: ThreadViewModel
     @StateObject private var thoughtViewModel: ThoughtViewModel
+    
     let thread: Thread
     let formatter: DateFormatter
     
@@ -123,6 +124,11 @@ struct ThreadDetailView: View {
         }
         .sheet(isPresented: $showingAddThought) {
             AddThoughtView(viewModel: thoughtViewModel)
+        }
+        .onChange(of: showingAddThought) { oldValue, newValue in
+            if !newValue {
+                thoughtViewModel.fetchThoughts()
+            }
         }
         .onAppear {
             thoughtViewModel.fetchThoughts()

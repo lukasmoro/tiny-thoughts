@@ -8,6 +8,7 @@
 import SwiftUI
 
 struct ThoughtView: View {
+    
     let thought: Thought
         
     var body: some View {

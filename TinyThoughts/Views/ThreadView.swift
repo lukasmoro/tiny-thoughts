@@ -14,17 +14,8 @@ struct ThreadView: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
             Text(thread.title ?? "Untitled Thread")
-                .font(.headline)
+                .font(.caption)
                 .padding(.bottom, 2)
-            
-            if let summary = thread.summary, !summary.isEmpty {
-                Text(summary)
-                    .font(.subheadline)
-                    .foregroundColor(.secondary)
-                    .lineLimit(2)
-                    .padding(.bottom, 2)
-            }
-            
             HStack {
                 if let thoughts = thread.thoughts?.allObjects as? [Thought] {
                     Text("\(thoughts.count) thought\(thoughts.count == 1 ? "" : "s")")

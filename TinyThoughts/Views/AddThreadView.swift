@@ -8,6 +8,7 @@
 import SwiftUI
 
 struct AddThreadView: View {
+    
     @ObservedObject var viewModel: ThreadViewModel
     @State private var title: String = ""
     @State private var summary: String = ""
@@ -18,10 +19,9 @@ struct AddThreadView: View {
         NavigationView {
             Form {
                 Section(header: Text("Thread Details")) {
-                    TextField("Thread Title", text: $title)
+                    TextField("Thread Name", text: $title)
                     
                     TextField("Summary (optional)", text: $summary, axis: .vertical)
-                        .lineLimit(3...5)
                 }
             }
             .navigationTitle("New Thread")

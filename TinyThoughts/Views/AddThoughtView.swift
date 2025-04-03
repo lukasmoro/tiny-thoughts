@@ -2,23 +2,23 @@
 //  AddThoughtView.swift
 //  TinyThoughts
 //
-//  Created for MVVM refactoring
+//  View for adding a new thought
 //
 
 import SwiftUI
 
 struct AddThoughtView: View {
+    
     @ObservedObject var viewModel: ThoughtViewModel
     @State private var thoughtContent: String = ""
     @Environment(\.dismiss) private var dismiss
     
     var body: some View {
         NavigationView {
-            VStack {
-                TextField("What's on your mind?", text: $thoughtContent, axis: .vertical)
-                    .textFieldStyle(RoundedBorderTextFieldStyle())
-                    .padding()
-                    .lineLimit(5...20)
+            Form {
+                Section(header: Text("Thought Details")) {
+                    TextField("What's on your mind?", text: $thoughtContent, axis: .vertical)
+                }
             }
             .navigationTitle("New Thought")
             .navigationBarTitleDisplayMode(.inline)
