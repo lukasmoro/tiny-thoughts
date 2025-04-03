@@ -12,6 +12,7 @@ struct ContentView: View {
     @Environment(\.managedObjectContext) private var viewContext
     @StateObject private var collectionViewModel: CollectionViewModel
     @State private var showingAddCollection = false
+    @State private var showingQuickAddThought = false
     
     // dummy content for testing
     init() {
@@ -53,6 +54,19 @@ struct ContentView: View {
                     }
                 }
             }
+            .overlay(
+                Button(action: {
+                    showingQuickAddThought = true
+                }) {
+                    Image(systemName: "pencil.circle.fill")
+                        .font(.system(size: 50))
+                        .foregroundColor(.blue)
+                        .shadow(radius: 3)
+                }
+                .padding([.bottom, .trailing], 30)
+                .accessibility(label: Text("Quick add thought"))
+                , alignment: .bottomTrailing
+            )
             
             // Secondary view when no collection is selected
             VStack {
@@ -72,14 +86,15 @@ struct ContentView: View {
         .sheet(isPresented: $showingAddCollection) {
             AddCollectionView(viewModel: collectionViewModel)
         }
+        .sheet(isPresented: $showingQuickAddThought) {
+            QuickAddThoughtView(collectionViewModel: collectionViewModel, viewContext: viewContext)
+        }
         .onChange(of: showingAddCollection) { oldValue, newValue in
             if !newValue {
-                // Collection add sheet was dismissed, refresh collections
                 collectionViewModel.fetchCollections()
             }
         }
         .onAppear {
-            // Replace the preview context with the actual context from the environment
             collectionViewModel.updateContext(viewContext)
         }
     }
