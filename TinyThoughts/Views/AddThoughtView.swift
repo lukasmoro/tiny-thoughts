@@ -2,7 +2,7 @@
 //  AddThoughtView.swift
 //  TinyThoughts
 //
-//  View for adding a new thought
+//  View for adding a new thought (when pressing the + button in the ThreadDetailView)
 //
 
 import SwiftUI

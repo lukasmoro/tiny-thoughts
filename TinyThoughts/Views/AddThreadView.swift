@@ -2,7 +2,7 @@
 //  AddThreadView.swift
 //  TinyThoughts
 //
-//  View for adding a new thread
+//  View for adding a new thread (when pressing the + button in the CollectionDetailView)
 //
 
 import SwiftUI

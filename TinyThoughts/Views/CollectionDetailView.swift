@@ -319,29 +319,29 @@ struct CollectionDetailView: View {
     
     // MARK: - Thoughts View
     private func thoughtsView(thread: Thread) -> some View {
-        VStack {
-            if thoughtViewModel.thoughts.isEmpty {
-                VStack(spacing: 20) {
-                    Spacer()
-                    
-                    Image(systemName: "text.bubble")
-                        .font(.system(size: 60))
-                        .foregroundColor(.gray)
-                    
-                    Text("No thoughts yet")
-                        .font(.headline)
-                    
-                    Text("Use the + button below to add your first thought")
-                        .font(.subheadline)
-                        .foregroundColor(.secondary)
-                        .multilineTextAlignment(.center)
-                        .padding(.horizontal)
-                    
-                    Spacer()
-                }
-                .frame(maxWidth: .infinity, maxHeight: .infinity)
-            } else {
-                ZStack {
+        ZStack {
+            VStack {
+                if thoughtViewModel.thoughts.isEmpty {
+                    VStack(spacing: 20) {
+                        Spacer()
+                        
+                        Image(systemName: "text.bubble")
+                            .font(.system(size: 60))
+                            .foregroundColor(.gray)
+                        
+                        Text("No thoughts yet")
+                            .font(.headline)
+                        
+                        Text("Use the + button below to add your first thought")
+                            .font(.subheadline)
+                            .foregroundColor(.secondary)
+                            .multilineTextAlignment(.center)
+                            .padding(.horizontal)
+                        
+                        Spacer()
+                    }
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+                } else {
                     List {
                         ForEach(thoughtViewModel.thoughts, id: \.id) { thought in
                             ThoughtView(thought: thought)
@@ -349,20 +349,20 @@ struct CollectionDetailView: View {
                         .onDelete(perform: thoughtViewModel.deleteThoughts)
                     }
                     .listStyle(PlainListStyle())
-                    
-                    VStack {
-                        Spacer()
-                        Button(action: { showingAddThought = true }) {
-                            Image(systemName: "plus")
-                                .font(.system(size: 20))
-                                .foregroundColor(.blue)
-                                .frame(width: 50, height: 50)
-                                .background(Color(.systemGray6))
-                                .clipShape(Circle())
-                        }
-                        .padding(.bottom, 10)
-                    }
                 }
+            }
+            
+            VStack {
+                Spacer()
+                Button(action: { showingAddThought = true }) {
+                    Image(systemName: "plus")
+                        .font(.system(size: 20))
+                        .foregroundColor(.blue)
+                        .frame(width: 50, height: 50)
+                        .background(Color(.systemGray6))
+                        .clipShape(Circle())
+                }
+                .padding(.bottom, 10)
             }
         }
     }
