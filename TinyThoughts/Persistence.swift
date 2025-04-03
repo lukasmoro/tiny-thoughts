@@ -14,15 +14,60 @@ struct PersistenceController {
     static let preview: PersistenceController = {
         let result = PersistenceController(inMemory: true)
         let viewContext = result.container.viewContext
-        for _ in 0..<10 {
-            let newItem = Item(context: viewContext)
-            newItem.timestamp = Date()
+        
+        // Create sample collections
+        let collections = [
+            ("Daily Reflections", "My everyday thoughts and observations"),
+            ("Project Ideas", "Brainstorming and ideas for future projects"),
+            ("Reading Notes", "Notes and thoughts from books I'm reading")
+        ]
+        
+        var createdCollections: [Collection] = []
+        
+        for (name, summary) in collections {
+            let collection = Collection(context: viewContext)
+            collection.id = UUID()
+            collection.name = name
+            collection.summary = summary
+            collection.creationDate = Date().addingTimeInterval(-Double.random(in: 0...86400*30))
+            collection.lastModified = collection.creationDate
+            createdCollections.append(collection)
         }
+        
+        // Create sample threads for each collection
+        let threads = [
+            ("Morning Reflections", "Thoughts captured during morning routine"),
+            ("Evening Wind-down", "End of day reflections and thoughts"),
+            ("Random Observations", "Miscellaneous observations throughout the day")
+        ]
+        
+        for collection in createdCollections {
+            for (title, summary) in threads {
+                let thread = Thread(context: viewContext)
+                thread.id = UUID()
+                thread.title = title
+                thread.summary = summary
+                thread.creationDate = Date().addingTimeInterval(-Double.random(in: 0...86400*15))
+                thread.lastModified = thread.creationDate
+                thread.collection = collection
+                
+                // Add 2-4 thoughts to each thread
+                let thoughtCount = Int.random(in: 2...4)
+                for i in 0..<thoughtCount {
+                    let thought = Thought(context: viewContext)
+                    thought.id = UUID()
+                    thought.content = "Sample thought #\(i+1) in \(thread.title ?? "Untitled"). This is a sample thought for preview purposes."
+                    thought.creationDate = Date().addingTimeInterval(-Double.random(in: 0...86400*10))
+                    thought.lastModified = thought.creationDate
+                    thought.position = Int16(i)
+                    thought.thread = thread
+                }
+            }
+        }
+        
         do {
             try viewContext.save()
         } catch {
-            // Replace this implementation with code to handle the error appropriately.
-            // fatalError() causes the application to generate a crash log and terminate. You should not use this function in a shipping application, although it may be useful during development.
             let nsError = error as NSError
             fatalError("Unresolved error \(nsError), \(nsError.userInfo)")
         }
