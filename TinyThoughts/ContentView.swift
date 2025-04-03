@@ -8,16 +8,16 @@
 import SwiftUI
 import CoreData
 
+/// The main view of the TinyThoughts app that displays collections and provides navigation
 struct ContentView: View {
+    // MARK: - Properties
+    
     @Environment(\.managedObjectContext) private var viewContext
     @StateObject private var collectionViewModel: CollectionViewModel
     @State private var showingAddCollection = false
     @State private var showingQuickAddThought = false
     
-    // dummy content for testing
-    init() {
-        _collectionViewModel = StateObject(wrappedValue: CollectionViewModel(viewContext: PersistenceController.shared.container.viewContext))
-    }
+    // MARK: - Constants
     
     private let dateFormatter: DateFormatter = {
         let formatter = DateFormatter()
@@ -26,62 +26,22 @@ struct ContentView: View {
         return formatter
     }()
     
+    private let quickAddButtonSize: CGFloat = 50
+    private let quickAddButtonShadowRadius: CGFloat = 3
+    
+    // MARK: - Initialization
+    
+    init() {
+        _collectionViewModel = StateObject(wrappedValue: CollectionViewModel(viewContext: PersistenceController.shared.container.viewContext))
+    }
+    
+    // MARK: - Body
+    
     var body: some View {
         NavigationView {
-            List {
-                ForEach(collectionViewModel.collections, id: \.id) { collection in
-                    NavigationLink {
-                        CollectionDetailView(
-                            viewContext: viewContext,
-                            collectionViewModel: collectionViewModel,
-                            collection: collection,
-                            formatter: dateFormatter
-                        )
-                    } label: {
-                        CollectionView(collection: collection)
-                    }
-                }
-                .onDelete(perform: collectionViewModel.deleteCollections)
-            }
-            .navigationTitle("Tiny Thoughts")
-            .toolbar {
-                ToolbarItem(placement: .navigationBarLeading) {
-                    EditButton()
-                }
-                ToolbarItem(placement: .navigationBarTrailing) {
-                    Button(action: { showingAddCollection = true }) {
-                        Label("Add Collection", systemImage: "plus")
-                    }
-                }
-            }
-            .overlay(
-                Button(action: {
-                    showingQuickAddThought = true
-                }) {
-                    Image(systemName: "pencil.circle.fill")
-                        .font(.system(size: 50))
-                        .foregroundColor(.blue)
-                        .shadow(radius: 3)
-                }
-                .padding([.bottom, .trailing], 30)
-                .accessibility(label: Text("Quick add thought"))
-                , alignment: .bottomTrailing
-            )
-            
-            // Secondary view when no collection is selected
-            VStack {
-                Image(systemName: "folder.fill")
-                    .font(.system(size: 60))
-                    .foregroundColor(.blue)
-                    .padding()
-                
-                Text("Select a Collection")
-                    .font(.title)
-                
-                Text("Or create a new one using the + button")
-                    .font(.subheadline)
-                    .foregroundColor(.gray)
-            }
+            mainContent
+                .toolbar { toolbarContent }
+                .overlay(quickAddButton, alignment: .bottomTrailing)
         }
         .sheet(isPresented: $showingAddCollection) {
             AddCollectionView(viewModel: collectionViewModel)
@@ -98,7 +58,69 @@ struct ContentView: View {
             collectionViewModel.updateContext(viewContext)
         }
     }
+    
+    // MARK: - View Components
+    
+    private var mainContent: some View {
+        VStack {
+            titleView
+            collectionsList
+        }
+    }
+    
+    private var titleView: some View {
+        Text("Tiny Thoughts")
+            .font(.largeTitle)
+            .fontWeight(.bold)
+            .frame(maxWidth: .infinity, alignment: .center)
+            .padding(.horizontal)
+            .padding(.top)
+    }
+    
+    private var collectionsList: some View {
+        List {
+            ForEach(collectionViewModel.collections, id: \.id) { collection in
+                NavigationLink {
+                    CollectionDetailView(
+                        viewContext: viewContext,
+                        collectionViewModel: collectionViewModel,
+                        collection: collection,
+                        formatter: dateFormatter
+                    )
+                } label: {
+                    CollectionView(collection: collection)
+                }
+            }
+            .onDelete(perform: collectionViewModel.deleteCollections)
+        }
+    }
+    
+    @ToolbarContentBuilder
+    private var toolbarContent: some ToolbarContent {
+        ToolbarItem(placement: .navigationBarLeading) {
+            EditButton()
+        }
+        ToolbarItem(placement: .navigationBarTrailing) {
+            Button(action: { showingAddCollection = true }) {
+                Label("Add Collection", systemImage: "plus")
+            }
+        }
+    }
+    
+    private var quickAddButton: some View {
+        Button(action: { showingQuickAddThought = true }) {
+            Image(systemName: "pencil.circle.fill")
+                .font(.system(size: quickAddButtonSize))
+                .foregroundColor(.blue)
+                .shadow(radius: quickAddButtonShadowRadius)
+        }
+        .accessibility(label: Text("Quick add thought"))
+        .padding(.trailing, 20)
+        .padding(.bottom, 20)
+    }
 }
+
+// MARK: - Preview
 
 #Preview {
     ContentView().environment(\.managedObjectContext, PersistenceController.preview.container.viewContext)

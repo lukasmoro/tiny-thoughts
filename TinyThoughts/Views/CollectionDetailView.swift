@@ -164,15 +164,9 @@ struct CollectionDetailView: View {
     // MARK: - Thread Content View
     private var threadContentView: some View {
         HStack(spacing: 0) {
+            threadDetailView
+            Divider()
             VStack {
-                HStack {
-                    Text("Threads")
-                        .font(.headline)
-                    Spacer()
-                }
-                .padding(.horizontal)
-                .padding(.top, 8)
-                
                 ZStack {
                     threadListView
                     
@@ -191,8 +185,6 @@ struct CollectionDetailView: View {
                 }
             }
             .frame(width: UIScreen.main.bounds.width * 0.35)
-            Divider()
-            threadDetailView
         }
     }
     
@@ -345,10 +337,12 @@ struct CollectionDetailView: View {
                     List {
                         ForEach(thoughtViewModel.thoughts, id: \.id) { thought in
                             ThoughtView(thought: thought)
+                                .listRowInsets(EdgeInsets())
                         }
                         .onDelete(perform: thoughtViewModel.deleteThoughts)
                     }
                     .listStyle(PlainListStyle())
+                    .padding(.horizontal, 0)
                 }
             }
             
