@@ -9,7 +9,6 @@ import SwiftUI
 
 struct CollectionView: View {
     let collection: Collection
-    let formatter: DateFormatter
     
     var body: some View {
         VStack(alignment: .leading) {
@@ -34,6 +33,7 @@ struct CollectionView: View {
                 Spacer()
             }
         }
-        .padding(5)
+        .padding(.horizontal, 5)
+        .padding(.vertical, 10)
     }
 } 

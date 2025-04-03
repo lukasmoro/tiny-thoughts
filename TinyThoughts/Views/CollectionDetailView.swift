@@ -173,16 +173,22 @@ struct CollectionDetailView: View {
                 .padding(.horizontal)
                 .padding(.top, 8)
                 
-                threadListView
-                
-                Button(action: { showingAddThread = true }) {
-                    Image(systemName: "plus")
-                        .font(.system(size: 20))
-                        .foregroundColor(.blue)
+                ZStack {
+                    threadListView
+                    
+                    VStack {
+                        Spacer()
+                        Button(action: { showingAddThread = true }) {
+                            Image(systemName: "plus")
+                                .font(.system(size: 20))
+                                .foregroundColor(.blue)
+                                .frame(width: 44, height: 44)
+                                .background(Color(.systemGray6))
+                                .clipShape(Circle())
+                        }
+                        .padding(.bottom, 10)
+                    }
                 }
-                .padding(.vertical, 10)
-                .frame(maxWidth: .infinity)
-                .background(Color(.systemGray6))
             }
             .frame(width: UIScreen.main.bounds.width * 0.35)
             Divider()
@@ -239,7 +245,7 @@ struct CollectionDetailView: View {
     // MARK: - Thread Header View
     private func threadHeaderView(thread: Thread) -> some View {
         VStack(alignment: .leading, spacing: 10) {
-            HStack {
+            HStack(alignment: .top) {
                 if threadEditState.isEditing {
                     TextField("Thread Title", text: $editedThreadTitle)
                         .font(.title2)
@@ -271,10 +277,11 @@ struct CollectionDetailView: View {
                         editedThreadSummary = thread.summary ?? ""
                         threadEditState.isEditing = true
                     }) {
-                        Image(systemName: "wrench")
-                            .font(.system(size: 20))
+                        Image(systemName: "pencil.circle")
+                            .font(.system(size: 25))
                             .foregroundColor(.blue)
                     }
+                    .padding(.top, 2)
                 }
             }
             
@@ -334,23 +341,29 @@ struct CollectionDetailView: View {
                 }
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
             } else {
-                List {
-                    ForEach(thoughtViewModel.thoughts, id: \.id) { thought in
-                        ThoughtView(thought: thought)
+                ZStack {
+                    List {
+                        ForEach(thoughtViewModel.thoughts, id: \.id) { thought in
+                            ThoughtView(thought: thought)
+                        }
+                        .onDelete(perform: thoughtViewModel.deleteThoughts)
                     }
-                    .onDelete(perform: thoughtViewModel.deleteThoughts)
+                    .listStyle(PlainListStyle())
+                    
+                    VStack {
+                        Spacer()
+                        Button(action: { showingAddThought = true }) {
+                            Image(systemName: "plus")
+                                .font(.system(size: 20))
+                                .foregroundColor(.blue)
+                                .frame(width: 50, height: 50)
+                                .background(Color(.systemGray6))
+                                .clipShape(Circle())
+                        }
+                        .padding(.bottom, 10)
+                    }
                 }
-                .listStyle(PlainListStyle())
             }
-            
-            Button(action: { showingAddThought = true }) {
-                Image(systemName: "plus")
-                    .font(.system(size: 20))
-                    .foregroundColor(.blue)
-            }
-            .padding(.vertical, 10)
-            .frame(maxWidth: .infinity)
-            .background(Color(.systemGray6))
         }
     }
 } 

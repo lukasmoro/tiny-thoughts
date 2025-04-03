@@ -37,7 +37,7 @@ struct ContentView: View {
                             formatter: dateFormatter
                         )
                     } label: {
-                        CollectionView(collection: collection, formatter: dateFormatter)
+                        CollectionView(collection: collection)
                     }
                 }
                 .onDelete(perform: collectionViewModel.deleteCollections)
