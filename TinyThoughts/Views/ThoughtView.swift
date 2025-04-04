@@ -19,9 +19,7 @@ struct ThoughtView: View {
                 .padding(.bottom, 5)
         }
         .padding(.vertical)
-        .padding(.horizontal, 16)  // Match the default horizontal padding of collection header
+        .padding(.horizontal, 16)
         .background(Color(.systemBackground))
-        .cornerRadius(10)
-        .shadow(radius: 1)
     }
 } 

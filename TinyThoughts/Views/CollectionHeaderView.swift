@@ -9,6 +9,7 @@ import SwiftUI
 import CoreData
 
 struct CollectionHeaderView: View {
+    
     // MARK: - Properties
     let collection: Collection
     let formatter: DateFormatter
@@ -28,9 +29,9 @@ struct CollectionHeaderView: View {
                         .bold()
                         .padding(.bottom, 5)
                 }
-
+                
                 Spacer()
-
+                
                 if editState.isEditing {
                     Button("Save") {
                         if !editState.name.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {

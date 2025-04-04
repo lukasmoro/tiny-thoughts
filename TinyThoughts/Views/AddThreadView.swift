@@ -20,7 +20,6 @@ struct AddThreadView: View {
             Form {
                 Section(header: Text("Thread Details")) {
                     TextField("Thread Name", text: $title)
-                    
                     TextField("Summary (optional)", text: $summary, axis: .vertical)
                 }
             }

@@ -12,11 +12,10 @@ struct QuickAddThoughtView: View {
     @Environment(\.dismiss) private var dismiss
     @ObservedObject var collectionViewModel: CollectionViewModel
     @ObservedObject var thoughtViewModel: ThoughtViewModel
+    @State private var threadViewModel: ThreadViewModel
     @State private var thoughtContent: String = ""
     @State private var selectedCollection: Collection?
     @State private var selectedThread: Thread?
-    
-    @State private var threadViewModel: ThreadViewModel
     
     init(collectionViewModel: CollectionViewModel, viewContext: NSManagedObjectContext) {
         self.collectionViewModel = collectionViewModel
