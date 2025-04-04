@@ -2,14 +2,21 @@
 //  ThoughtViewModel.swift
 //  TinyThoughts
 //
-//  Created for MVVM refactoring
+//  created for tiny software by lukas moro
 //
+//  thought view model manages thoughts
+//  handles CRUD operations
+//  maintains a list of thoughts
+//  provides methods to add, update, and delete thoughts
+//  provides a method to fetch thoughts from the database
+//  provides a method to save the context
 
 import Foundation
 import CoreData
 import Combine
 
 class ThoughtViewModel: ObservableObject {
+   
     @Published var thoughts: [Thought] = []
     private var cancellables = Set<AnyCancellable>()
     private var viewContext: NSManagedObjectContext
@@ -25,7 +32,6 @@ class ThoughtViewModel: ObservableObject {
         let request = NSFetchRequest<Thought>(entityName: "Thought")
         
         if let thread = thread {
-            // Fetch thoughts only from this thread
             request.predicate = NSPredicate(format: "thread == %@", thread)
         }
         
@@ -46,17 +52,13 @@ class ThoughtViewModel: ObservableObject {
         newThought.creationDate = Date()
         newThought.lastModified = Date()
         newThought.position = getNextPosition()
-        
-        // Assign to thread (either provided or current thread)
         newThought.thread = thread ?? self.thread
-        
         saveContext()
     }
     
     func updateThought(_ thought: Thought, content: String) {
         thought.content = content
         thought.lastModified = Date()
-        
         saveContext()
     }
     
@@ -64,16 +66,13 @@ class ThoughtViewModel: ObservableObject {
         thought.thread = newThread
         thought.lastModified = Date()
         thought.position = getNextPosition(for: newThread)
-        
         saveContext()
     }
     
     func reorderThoughts(_ thoughts: [Thought]) {
-        // Update position values for all thoughts
         for (index, thought) in thoughts.enumerated() {
             thought.position = Int16(index)
         }
-        
         saveContext()
     }
     
@@ -107,14 +106,13 @@ class ThoughtViewModel: ObservableObject {
                 }
             }
         }
-        
         return 0
     }
     
     private func saveContext() {
         do {
             try viewContext.save()
-            fetchThoughts() // Refresh data after changes
+            fetchThoughts()
         } catch {
             print("Error saving context: \(error)")
         }
