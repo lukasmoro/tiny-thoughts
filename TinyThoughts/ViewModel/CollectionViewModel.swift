@@ -18,8 +18,10 @@ import Combine
 class CollectionViewModel: ObservableObject {
     
     // MARK: - Properties       
-    // published collections & private view context
+    // published collections 
     @Published var collections: [Collection] = []
+
+    // private view context
     private var viewContext: NSManagedObjectContext
     
     // MARK: - Initialization
@@ -53,6 +55,13 @@ class CollectionViewModel: ObservableObject {
         saveContext()
     }
     
+    // MARK: - Delete Collection
+    // deletes a collection from the database
+    func deleteCollection(_ collection: Collection) {
+        viewContext.delete(collection)
+        saveContext()
+    }
+
     // MARK: - Update Collection
     // updates a collection in the database
     func updateCollection(_ collection: Collection, name: String, summary: String? = nil) {
@@ -60,20 +69,6 @@ class CollectionViewModel: ObservableObject {
         collection.summary = summary
         collection.lastModified = Date()
         saveContext()
-    }
-    
-    // MARK: - Delete Collection
-    // deletes a collection from the database
-    func deleteCollection(_ collection: Collection) {
-        viewContext.delete(collection)
-        saveContext()
-    }
-    
-    // MARK: - Update Context
-    // updates the context
-    func updateContext(_ newContext: NSManagedObjectContext) {
-        self.viewContext = newContext
-        fetchCollections()
     }
     
     // MARK: - Save Context
@@ -85,5 +80,12 @@ class CollectionViewModel: ObservableObject {
         } catch {
             print("Error saving context: \(error)")
         }
+    }
+    
+    // MARK: - Update Context
+    // updates the context
+    func updateContext(_ newContext: NSManagedObjectContext) {
+        self.viewContext = newContext
+        fetchCollections()
     }
 } 
