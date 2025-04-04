@@ -48,7 +48,7 @@ struct ContentView: View {
         NavigationView {
             VStack {
                 titleView
-                collectionsGrid
+                collectionsGridView
             }
             .toolbar { toolbarContent }
             .overlay(quickAddButton, alignment: .bottomTrailing)
@@ -82,7 +82,7 @@ struct ContentView: View {
     }
 
     // grid of collections
-    private var collectionsGrid: some View {
+    private var collectionsGridView: some View {
         ScrollView {
             LazyVGrid(columns: AppConfig.Grid.columns, spacing: AppConfig.Grid.spacing) {
                 ForEach(collectionViewModel.collections, id: \.id) { collection in
@@ -113,15 +113,13 @@ struct ContentView: View {
 
     // card view of the collection
     private struct CollectionCardView: View {
-        
         let collection: Collection
-        
+
         var body: some View {
             VStack(alignment: .leading) {
                 Text(collection.name ?? "Unnamed Collection")
                     .font(.headline)
                     .padding(.bottom, 4)
-                
                 if let summary = collection.summary, !summary.isEmpty {
                     Text(summary)
                         .font(.subheadline)
@@ -129,7 +127,6 @@ struct ContentView: View {
                         .lineLimit(2)
                         .padding(.bottom, 4)
                 }
-                
                 HStack {
                     if let threads = collection.threads?.allObjects as? [Thread] {
                         Text("\(threads.count) thread\(threads.count == 1 ? "" : "s")")

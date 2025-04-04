@@ -44,15 +44,7 @@ struct ThreadListView: View {
             
             VStack {
                 Spacer()
-                Button(action: { showingAddThread = true }) {
-                    Image(systemName: "plus")
-                        .font(.system(size: 20))
-                        .foregroundColor(.blue)
-                        .frame(width: 44, height: 44)
-                        .background(Color(.systemGray6))
-                        .clipShape(Circle())
-                }
-                .padding(.bottom, 10)
+                AddButtonView(action: { showingAddThread = true })
             }
         }
     }
