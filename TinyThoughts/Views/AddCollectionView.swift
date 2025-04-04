@@ -2,7 +2,7 @@
 //  AddCollectionView.swift
 //  TinyThoughts
 //
-//  View for adding a new collection (when pressing the + button in the CollectionView)
+//  adding a new collection (when pressing the + button in the CollectionView)
 //
 
 import SwiftUI

@@ -2,7 +2,7 @@
 //  AddThreadView.swift
 //  TinyThoughts
 //
-//  View for adding a new thread
+//  View for adding a new thread (when pressing the + button in the CollectionDetailView)
 //
 
 import SwiftUI
@@ -20,7 +20,6 @@ struct AddThreadView: View {
             Form {
                 Section(header: Text("Thread Details")) {
                     TextField("Thread Name", text: $title)
-                    
                     TextField("Summary (optional)", text: $summary, axis: .vertical)
                 }
             }

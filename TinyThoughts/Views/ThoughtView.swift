@@ -18,9 +18,8 @@ struct ThoughtView: View {
                 .lineLimit(nil)
                 .padding(.bottom, 5)
         }
-        .padding()
+        .padding(.vertical)
+        .padding(.horizontal, 16)
         .background(Color(.systemBackground))
-        .cornerRadius(10)
-        .shadow(radius: 1)
     }
 } 

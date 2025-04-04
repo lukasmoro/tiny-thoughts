@@ -2,14 +2,21 @@
 //  ThreadViewModel.swift
 //  TinyThoughts
 //
-//  Created for MVVM refactoring
+//  created for tiny software by lukas moro
 //
+//  thread view model manages threads
+//  handles CRUD operations
+//  maintains a list of threads
+//  provides methods to add, update, and delete threads
+//  provides a method to fetch threads from the database
+//  provides a method to save the context
 
 import Foundation
 import CoreData
 import Combine
 
 class ThreadViewModel: ObservableObject {
+   
     @Published var threads: [Thread] = []
     private var viewContext: NSManagedObjectContext
     private var collection: Collection?
@@ -24,7 +31,6 @@ class ThreadViewModel: ObservableObject {
         let request = NSFetchRequest<Thread>(entityName: "Thread")
         
         if let collection = collection {
-            // Fetch threads only from this collection
             request.predicate = NSPredicate(format: "collection == %@", collection)
         }
         
