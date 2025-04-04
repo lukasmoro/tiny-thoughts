@@ -20,7 +20,7 @@ struct ContentView: View {
     @State private var activeSheet: ActiveSheet?
 
     // MARK: - Types
-    // active sheet enum
+    // active sheet enum for activating addCollection and quickAddThought views 
     private enum ActiveSheet: Identifiable {
         case addCollection
         case quickAddThought
@@ -33,12 +33,11 @@ struct ContentView: View {
     }
     
     // MARK: - Constants
-    // grid columns, grid spacing 
+    // grid columns
     private let gridColumns = [GridItem(.adaptive(minimum: 300), spacing: 16)]
-    private let gridSpacing: CGFloat = 16
     
     // MARK: - Initialization
-    // initializes the content view through the collection view model
+    // initializes the content view through the collection view model and the persistence controller
     init() {
         _collectionViewModel = StateObject(wrappedValue: CollectionViewModel(viewContext: PersistenceController.shared.container.viewContext))
     }
@@ -47,9 +46,12 @@ struct ContentView: View {
     // body is the main view of the content view
     var body: some View {
         NavigationView {
-            mainContent
-                .toolbar { toolbarContent }
-                .overlay(quickAddButton, alignment: .bottomTrailing)
+            VStack {
+                titleView
+                collectionsGrid
+            }
+            .toolbar { toolbarContent }
+            .overlay(quickAddButton, alignment: .bottomTrailing)
         }
         .sheet(item: $activeSheet) { sheet in
             switch sheet {
@@ -69,29 +71,20 @@ struct ContentView: View {
         }
     }
     
-    // MARK: - View Components
-    // main content is the main view of the content view
-    private var mainContent: some View {
-        VStack {
-            titleView
-            collectionsGrid
-        }
-    }
-    
-    // title view is the title of the content view
+    // title of the content view
     private var titleView: some View {
         Text("🪡💭")
             .font(.largeTitle)
             .fontWeight(.bold)
             .frame(maxWidth: .infinity, alignment: .center)
-            .padding(.horizontal)
+            .padding(.horizontal, AppConfig.Padding.horizontal)
             .padding(.top)
     }
 
-    // collections grid is the grid of collections
+    // grid of collections
     private var collectionsGrid: some View {
         ScrollView {
-            LazyVGrid(columns: gridColumns, spacing: gridSpacing) {
+            LazyVGrid(columns: AppConfig.Grid.columns, spacing: AppConfig.Grid.spacing) {
                 ForEach(collectionViewModel.collections, id: \.id) { collection in
                     NavigationLink {
                         CollectionDetailView(
@@ -113,13 +106,14 @@ struct ContentView: View {
                     }
                 }
             }
-            .padding()
+            .padding(AppConfig.Padding.grid)
         }
-        .padding(.bottom, 30)
+        .padding(.bottom, AppConfig.Padding.vertical)
     }
 
-    // collection card view is the card view of the collection
+    // card view of the collection
     private struct CollectionCardView: View {
+        
         let collection: Collection
         
         var body: some View {
@@ -168,13 +162,13 @@ struct ContentView: View {
     private var quickAddButton: some View {
         Button(action: { activeSheet = .quickAddThought }) {
             Image(systemName: "pencil.circle.fill")
-                .font(.system(size: 50)) 
-                .foregroundColor(.blue)
-                .shadow(radius: 3)
+                .font(.system(size: AppConfig.Layout.quickAddButtonSize)) 
+                .foregroundColor(AppConfig.Colors.threadCount)
+                .shadow(radius: AppConfig.Layout.cardShadowRadius)
         }
         .accessibility(label: Text("Quick add thought"))
-        .padding(.trailing, 20)
-        .padding(.bottom, 20)
+        .padding(.trailing, AppConfig.Padding.horizontal)
+        .padding(.bottom, AppConfig.Padding.vertical)
     }
 }
 
@@ -183,4 +177,3 @@ struct ContentView: View {
 #Preview {
     ContentView().environment(\.managedObjectContext, PersistenceController.preview.container.viewContext)
 }
-
