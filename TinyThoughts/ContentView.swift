@@ -2,37 +2,28 @@
 //  ContentView.swift
 //  TinyThoughts
 //
-//  Created by Lukas Moro on 02.04.25.
+//  created for tiny software by lukas moro
 //
+//  content view is the main view of the app
+//  it displays the collections and allows the user to add new collections
+//  it also allows the user to add new thoughts to the selected collection via quick add (NEEDS FIXING)
 
 import SwiftUI
 import CoreData
 
 struct ContentView: View {
-    // MARK: - Properties
     
+    // MARK: - Properties
+    // environment manages object context through core data, collection view model, active sheet        
     @Environment(\.managedObjectContext) private var viewContext
     @StateObject private var collectionViewModel: CollectionViewModel
     @State private var activeSheet: ActiveSheet?
-    
-    // MARK: - Constants
-    
-    private let dateFormatter: DateFormatter = {
-        let formatter = DateFormatter()
-        formatter.dateStyle = .short
-        formatter.timeStyle = .short
-        return formatter
-    }()
-    
-    private let gridColumns = [GridItem(.adaptive(minimum: 300), spacing: 16)]
-    private let gridSpacing: CGFloat = 16
-    
+
     // MARK: - Types
-    
+    // active sheet enum
     private enum ActiveSheet: Identifiable {
         case addCollection
         case quickAddThought
-        
         var id: Int {
             switch self {
             case .addCollection: return 0
@@ -41,14 +32,19 @@ struct ContentView: View {
         }
     }
     
-    // MARK: - Initialization
+    // MARK: - Constants
+    // grid columns, grid spacing 
+    private let gridColumns = [GridItem(.adaptive(minimum: 300), spacing: 16)]
+    private let gridSpacing: CGFloat = 16
     
+    // MARK: - Initialization
+    // initializes the content view through the collection view model
     init() {
         _collectionViewModel = StateObject(wrappedValue: CollectionViewModel(viewContext: PersistenceController.shared.container.viewContext))
     }
     
     // MARK: - Body
-    
+    // body is the main view of the content view
     var body: some View {
         NavigationView {
             mainContent
@@ -74,7 +70,7 @@ struct ContentView: View {
     }
     
     // MARK: - View Components
-    
+    // main content is the main view of the content view
     private var mainContent: some View {
         VStack {
             titleView
@@ -82,6 +78,7 @@ struct ContentView: View {
         }
     }
     
+    // title view is the title of the content view
     private var titleView: some View {
         Text("🪡💭")
             .font(.largeTitle)
@@ -90,7 +87,8 @@ struct ContentView: View {
             .padding(.horizontal)
             .padding(.top)
     }
-    
+
+    // collections grid is the grid of collections
     private var collectionsGrid: some View {
         ScrollView {
             LazyVGrid(columns: gridColumns, spacing: gridSpacing) {
@@ -100,7 +98,7 @@ struct ContentView: View {
                             viewContext: viewContext,
                             collectionViewModel: collectionViewModel,
                             collection: collection,
-                            formatter: dateFormatter
+                            formatter: DateFormatterManager.shared.dateFormatter
                         )
                     } label: {
                         CollectionCardView(collection: collection)
@@ -120,6 +118,7 @@ struct ContentView: View {
         .padding(.bottom, 30)
     }
 
+    // collection card view is the card view of the collection
     private struct CollectionCardView: View {
         let collection: Collection
         
@@ -154,7 +153,8 @@ struct ContentView: View {
             )
         }
     }
-    
+
+    // toolbar content is the toolbar of the content view
     @ToolbarContentBuilder
     private var toolbarContent: some ToolbarContent {
         ToolbarItem(placement: .navigationBarTrailing) {
@@ -163,7 +163,8 @@ struct ContentView: View {
             }
         }
     }
-    
+
+    // quick add button is the button to add a new thought to the selected collection
     private var quickAddButton: some View {
         Button(action: { activeSheet = .quickAddThought }) {
             Image(systemName: "pencil.circle.fill")
@@ -178,7 +179,7 @@ struct ContentView: View {
 }
 
 // MARK: - Preview
-
+// preview is the preview of the content view (NOT NEEDED IN PRODUCTION)
 #Preview {
     ContentView().environment(\.managedObjectContext, PersistenceController.preview.container.viewContext)
 }
