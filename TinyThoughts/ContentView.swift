@@ -8,7 +8,7 @@
 import SwiftUI
 import CoreData
 
-/// The main view of the TinyThoughts app that displays collections and provides navigation
+/// main view of the TinyThoughts app that displays collections and provides navigation
 struct ContentView: View {
     // MARK: - Properties
     
@@ -69,7 +69,7 @@ struct ContentView: View {
     }
     
     private var titleView: some View {
-        Text("Tiny Thoughts")
+        Text("Tiny Thoughts 💭")
             .font(.largeTitle)
             .fontWeight(.bold)
             .frame(maxWidth: .infinity, alignment: .center)
