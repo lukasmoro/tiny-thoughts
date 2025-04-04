@@ -8,14 +8,12 @@
 import SwiftUI
 import CoreData
 
-/// main view of the TinyThoughts app that displays collections and provides navigation
 struct ContentView: View {
     // MARK: - Properties
     
     @Environment(\.managedObjectContext) private var viewContext
     @StateObject private var collectionViewModel: CollectionViewModel
-    @State private var showingAddCollection = false
-    @State private var showingQuickAddThought = false
+    @State private var activeSheet: ActiveSheet?
     
     // MARK: - Constants
     
@@ -26,8 +24,22 @@ struct ContentView: View {
         return formatter
     }()
     
-    private let quickAddButtonSize: CGFloat = 50
-    private let quickAddButtonShadowRadius: CGFloat = 3
+    private let gridColumns = [GridItem(.adaptive(minimum: 300), spacing: 16)]
+    private let gridSpacing: CGFloat = 16
+    
+    // MARK: - Types
+    
+    private enum ActiveSheet: Identifiable {
+        case addCollection
+        case quickAddThought
+        
+        var id: Int {
+            switch self {
+            case .addCollection: return 0
+            case .quickAddThought: return 1
+            }
+        }
+    }
     
     // MARK: - Initialization
     
@@ -43,14 +55,16 @@ struct ContentView: View {
                 .toolbar { toolbarContent }
                 .overlay(quickAddButton, alignment: .bottomTrailing)
         }
-        .sheet(isPresented: $showingAddCollection) {
-            AddCollectionView(viewModel: collectionViewModel)
+        .sheet(item: $activeSheet) { sheet in
+            switch sheet {
+            case .addCollection:
+                AddCollectionView(viewModel: collectionViewModel)
+            case .quickAddThought:
+                QuickAddThoughtView(collectionViewModel: collectionViewModel, viewContext: viewContext)
+            }
         }
-        .sheet(isPresented: $showingQuickAddThought) {
-            QuickAddThoughtView(collectionViewModel: collectionViewModel, viewContext: viewContext)
-        }
-        .onChange(of: showingAddCollection) { oldValue, newValue in
-            if !newValue {
+        .onChange(of: activeSheet) { oldValue, newValue in
+            if newValue == nil {
                 collectionViewModel.fetchCollections()
             }
         }
@@ -64,12 +78,12 @@ struct ContentView: View {
     private var mainContent: some View {
         VStack {
             titleView
-            collectionsList
+            collectionsGrid
         }
     }
     
     private var titleView: some View {
-        Text("Tiny Thoughts 💭")
+        Text("🪡💭")
             .font(.largeTitle)
             .fontWeight(.bold)
             .frame(maxWidth: .infinity, alignment: .center)
@@ -77,42 +91,85 @@ struct ContentView: View {
             .padding(.top)
     }
     
-    private var collectionsList: some View {
-        List {
-            ForEach(collectionViewModel.collections, id: \.id) { collection in
-                NavigationLink {
-                    CollectionDetailView(
-                        viewContext: viewContext,
-                        collectionViewModel: collectionViewModel,
-                        collection: collection,
-                        formatter: dateFormatter
-                    )
-                } label: {
-                    CollectionView(collection: collection)
+    private var collectionsGrid: some View {
+        ScrollView {
+            LazyVGrid(columns: gridColumns, spacing: gridSpacing) {
+                ForEach(collectionViewModel.collections, id: \.id) { collection in
+                    NavigationLink {
+                        CollectionDetailView(
+                            viewContext: viewContext,
+                            collectionViewModel: collectionViewModel,
+                            collection: collection,
+                            formatter: dateFormatter
+                        )
+                    } label: {
+                        CollectionCardView(collection: collection)
+                    }
+                    .buttonStyle(PlainButtonStyle())
+                    .contextMenu {
+                        Button(role: .destructive) {
+                            collectionViewModel.deleteCollection(collection)
+                        } label: {
+                            Label("Delete", systemImage: "trash")
+                        }
+                    }
                 }
             }
-            .onDelete(perform: collectionViewModel.deleteCollections)
+            .padding()
+        }
+        .padding(.bottom, 30)
+    }
+
+    private struct CollectionCardView: View {
+        let collection: Collection
+        
+        var body: some View {
+            VStack(alignment: .leading) {
+                Text(collection.name ?? "Unnamed Collection")
+                    .font(.headline)
+                    .padding(.bottom, 4)
+                
+                if let summary = collection.summary, !summary.isEmpty {
+                    Text(summary)
+                        .font(.subheadline)
+                        .foregroundColor(.secondary)
+                        .lineLimit(2)
+                        .padding(.bottom, 4)
+                }
+                
+                HStack {
+                    if let threads = collection.threads?.allObjects as? [Thread] {
+                        Text("\(threads.count) thread\(threads.count == 1 ? "" : "s")")
+                            .font(.caption)
+                            .foregroundColor(.blue)
+                    }
+                    Spacer()
+                }
+            }
+            .padding()
+            .background(
+                RoundedRectangle(cornerRadius: 12)
+                    .fill(Color(.systemBackground))
+                    .shadow(color: Color.black.opacity(0.1), radius: 5, x: 0, y: 2)
+            )
         }
     }
     
     @ToolbarContentBuilder
     private var toolbarContent: some ToolbarContent {
-        ToolbarItem(placement: .navigationBarLeading) {
-            EditButton()
-        }
         ToolbarItem(placement: .navigationBarTrailing) {
-            Button(action: { showingAddCollection = true }) {
+            Button(action: { activeSheet = .addCollection }) {
                 Label("Add Collection", systemImage: "plus")
             }
         }
     }
     
     private var quickAddButton: some View {
-        Button(action: { showingQuickAddThought = true }) {
+        Button(action: { activeSheet = .quickAddThought }) {
             Image(systemName: "pencil.circle.fill")
-                .font(.system(size: quickAddButtonSize))
+                .font(.system(size: 50)) 
                 .foregroundColor(.blue)
-                .shadow(radius: quickAddButtonShadowRadius)
+                .shadow(radius: 3)
         }
         .accessibility(label: Text("Quick add thought"))
         .padding(.trailing, 20)
