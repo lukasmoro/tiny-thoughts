@@ -2,7 +2,9 @@
 //  ThoughtsContentView.swift
 //  TinyThoughts
 //
-//  Component for displaying a list of thoughts
+//  created for tiny software by lukas moro
+//
+//  thoughts content view used for displaying thoughts in the thread content view
 //
 
 import SwiftUI
@@ -18,25 +20,11 @@ struct ThoughtsContentView: View {
         ZStack {
             VStack {
                 if thoughtViewModel.thoughts.isEmpty {
-                    VStack(spacing: 20) {
-                        Spacer()
-                        
-                        Image(systemName: "text.bubble")
-                            .font(.system(size: 60))
-                            .foregroundColor(.gray)
-                        
-                        Text("No thoughts yet")
-                            .font(.headline)
-                        
-                        Text("Use the + button below to add your first thought")
-                            .font(.subheadline)
-                            .foregroundColor(.secondary)
-                            .multilineTextAlignment(.center)
-                            .padding(.horizontal)
-                        
-                        Spacer()
-                    }
-                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+                    EmptyStateView(
+                        icon: "text.bubble",
+                        title: "No thoughts yet",
+                        message: "Use the + button below to add your first thought"
+                    )
                 } else {
                     List {
                         ForEach(thoughtViewModel.thoughts, id: \.id) { thought in
@@ -52,15 +40,7 @@ struct ThoughtsContentView: View {
             
             VStack {
                 Spacer()
-                Button(action: { showingAddThought = true }) {
-                    Image(systemName: "plus")
-                        .font(.system(size: 20))
-                        .foregroundColor(.blue)
-                        .frame(width: 50, height: 50)
-                        .background(Color(.systemGray6))
-                        .clipShape(Circle())
-                }
-                .padding(.bottom, 10)
+                AddButtonView(action: { showingAddThought = true }, size: 50)
             }
         }
     }

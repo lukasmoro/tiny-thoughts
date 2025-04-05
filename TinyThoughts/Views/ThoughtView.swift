@@ -2,7 +2,9 @@
 //  ThoughtView.swift
 //  TinyThoughts
 //
-//  View for displaying a thought
+//  created for tiny software by lukas moro
+//
+//  thought view used for displaying a thought in the thread content view
 //
 
 import SwiftUI

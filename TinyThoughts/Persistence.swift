@@ -2,21 +2,47 @@
 //  Persistence.swift
 //  TinyThoughts
 //
-//  Created by Lukas Moro on 02.04.25.
+//  created for tiny software by lukas moro
 //
+//  persistence controller is a singleton that manages the core data stack
+//  handles the creation of the persistent container
+//  provides a shared controller for the app
+//  provides a preview controller for prototyping
 
 import CoreData
 
 struct PersistenceController {
     
+    // MARK: - Properties
+    // shared instance of the persistence controller
     static let shared = PersistenceController()
 
+    // MARK: - Container
+    // container is the persistent container that manages the core data stack   
+    let container: NSPersistentContainer
+
+    init(inMemory: Bool = false) {
+        container = NSPersistentContainer(name: "TinyThoughts")
+        if inMemory {
+            container.persistentStoreDescriptions.first!.url = URL(fileURLWithPath: "/dev/null")
+        }
+        container.loadPersistentStores(completionHandler: { (storeDescription, error) in
+            if let error = error as NSError? {
+                // add errorhandling here
+                fatalError("Unresolved error \(error), \(error.userInfo)")
+            }
+        })
+        container.viewContext.automaticallyMergesChangesFromParent = true
+    }
+
+    // MARK: - Preview
+    // preview instance of the persistence controller (NOT NEEDED IN PRODUCTION)
     @MainActor
     static let preview: PersistenceController = {
         let result = PersistenceController(inMemory: true)
         let viewContext = result.container.viewContext
         
-        // Create sample collections
+        //sample collections
         let collections = [
             ("Daily Reflections", "My everyday thoughts and observations"),
             ("Project Ideas", "Brainstorming and ideas for future projects"),
@@ -35,7 +61,7 @@ struct PersistenceController {
             createdCollections.append(collection)
         }
         
-        // Create sample threads for each collection
+        //sample threads for each collection
         let threads = [
             ("Morning Reflections", "Thoughts captured during morning routine"),
             ("Evening Wind-down", "End of day reflections and thoughts"),
@@ -52,7 +78,7 @@ struct PersistenceController {
                 thread.lastModified = thread.creationDate
                 thread.collection = collection
                 
-                // Add 2-4 thoughts to each thread
+                //2-4 thoughts to each thread
                 let thoughtCount = Int.random(in: 2...4)
                 for i in 0..<thoughtCount {
                     let thought = Thought(context: viewContext)
@@ -74,20 +100,4 @@ struct PersistenceController {
         }
         return result
     }()
-
-    let container: NSPersistentContainer
-
-    init(inMemory: Bool = false) {
-        container = NSPersistentContainer(name: "TinyThoughts")
-        if inMemory {
-            container.persistentStoreDescriptions.first!.url = URL(fileURLWithPath: "/dev/null")
-        }
-        container.loadPersistentStores(completionHandler: { (storeDescription, error) in
-            if let error = error as NSError? {
-                // add errorhandling here
-                fatalError("Unresolved error \(error), \(error.userInfo)")
-            }
-        })
-        container.viewContext.automaticallyMergesChangesFromParent = true
-    }
 }

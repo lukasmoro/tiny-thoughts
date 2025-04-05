@@ -2,7 +2,9 @@
 //  ThreadListView.swift
 //  TinyThoughts
 //
-//  Component for displaying a list of threads
+//  created for tiny software by lukas moro
+//
+//  thread list view used for displaying a list of threads in the thread detail view
 //
 
 import SwiftUI
@@ -44,15 +46,7 @@ struct ThreadListView: View {
             
             VStack {
                 Spacer()
-                Button(action: { showingAddThread = true }) {
-                    Image(systemName: "plus")
-                        .font(.system(size: 20))
-                        .foregroundColor(.blue)
-                        .frame(width: 44, height: 44)
-                        .background(Color(.systemGray6))
-                        .clipShape(Circle())
-                }
-                .padding(.bottom, 10)
+                AddButtonView(action: { showingAddThread = true })
             }
         }
     }

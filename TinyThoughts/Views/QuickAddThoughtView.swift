@@ -2,7 +2,9 @@
 //  QuickAddThoughtView.swift
 //  TinyThoughts
 //
-//  View for quickly adding a thought from anywhere in the app
+//  created for tiny software by lukas moro
+//
+//  quick add thought view used for adding new thoughts from anywhere in the app through the sheet manager
 //
 
 import SwiftUI

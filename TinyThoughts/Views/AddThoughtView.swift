@@ -2,8 +2,10 @@
 //  AddThoughtView.swift
 //  TinyThoughts
 //
-//  adding a new thought (when pressing the + button in the ThreadDetailView)
+//  created for tiny software by lukas moro
 //
+//  add thought view used for adding new thoughts from the collection detail view through the sheet manager
+//  
 
 import SwiftUI
 

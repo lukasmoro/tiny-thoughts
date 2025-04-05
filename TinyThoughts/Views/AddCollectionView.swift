@@ -2,7 +2,9 @@
 //  AddCollectionView.swift
 //  TinyThoughts
 //
-//  adding a new collection (when pressing the + button in the CollectionView)
+//  created for tiny software by lukas moro
+//
+//  add collection view used for adding new collections from the content view through the sheet manager
 //
 
 import SwiftUI
