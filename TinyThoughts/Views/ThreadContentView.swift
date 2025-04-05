@@ -15,6 +15,9 @@ struct ThreadContentView: View {
     @Binding var selectedThread: Thread?
     @Binding var showingAddThread: Bool
     @Binding var showingAddThought: Bool
+    @Binding var isEditingThread: Bool
+    @Binding var editedThreadTitle: String
+    @Binding var editedThreadSummary: String
     let formatter: DateFormatter
     
     // MARK: - Body
@@ -43,9 +46,9 @@ struct ThreadContentView: View {
                     thread: thread,
                     formatter: formatter,
                     threadViewModel: threadViewModel,
-                    isEditing: .constant(false),
-                    editedTitle: .constant(""),
-                    editedSummary: .constant("")
+                    isEditing: $isEditingThread,
+                    editedTitle: $editedThreadTitle,
+                    editedSummary: $editedThreadSummary
                 )
                 Divider()
                 ThoughtsContentView(

@@ -2,7 +2,9 @@
 //  CollectionDetailView.swift
 //  TinyThoughts
 //
-//  View for displaying and editing a collection
+//  created for tiny software by lukas moro
+//
+//  collection detail view used for displaying a collection and its threads and thoughts
 //
 
 import SwiftUI
@@ -33,6 +35,7 @@ struct CollectionDetailView: View {
     // MARK: - Thread State
     @State private var selectedThread: Thread? = nil
     @State private var showingAddThread = false
+    @State private var isEditingThread = false
     @State private var editedThreadTitle: String = ""
     @State private var editedThreadSummary: String = ""
 
@@ -64,6 +67,9 @@ struct CollectionDetailView: View {
                 selectedThread: $selectedThread,
                 showingAddThread: $showingAddThread,
                 showingAddThought: $showingAddThought,
+                isEditingThread: $isEditingThread,
+                editedThreadTitle: $editedThreadTitle,
+                editedThreadSummary: $editedThreadSummary,
                 formatter: formatter
             )
         }

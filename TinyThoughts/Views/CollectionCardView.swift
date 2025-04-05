@@ -17,13 +17,13 @@ struct CollectionCardView: View {
         VStack(alignment: .leading) {
             Text(collection.name ?? "Unnamed Collection")
                 .font(.headline)
-                .padding(.bottom, 8)
+                .padding(.bottom, AppConfig.Padding.header)
             if let summary = collection.summary, !summary.isEmpty {
                 Text(summary)
                     .font(.subheadline)
                     .foregroundColor(.secondary)
                     .lineLimit(2)
-                    .padding(.bottom, 8)
+                    .padding(.bottom, AppConfig.Padding.text)
             }
             HStack {
                 if let threads = collection.threads?.allObjects as? [Thread] {

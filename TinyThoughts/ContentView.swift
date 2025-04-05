@@ -32,7 +32,7 @@ struct ContentView: View {
     var body: some View {
         NavigationView {
             ScrollView {
-                LazyVStack(spacing: AppConfig.Grid.spacing) {
+                LazyVStack(spacing: AppConfig.Spacing.spacer) {
                     ForEach(collectionViewModel.collections, id: \.id) { collection in
                         NavigationLink {
                             CollectionDetailView(
@@ -86,9 +86,8 @@ struct ContentView: View {
                 .foregroundColor(AppConfig.Colors.threadCount)
                 .shadow(radius: AppConfig.Layout.cardShadowRadius)
         }
-        .accessibility(label: Text("Quick add thought"))
-        .padding(.trailing, AppConfig.Padding.horizontal)
-        .padding(.bottom, AppConfig.Padding.vertical)
+        .padding(.horizontal, AppConfig.Padding.horizontal)
+        .padding(.vertical, AppConfig.Padding.vertical)
     }
 }
 

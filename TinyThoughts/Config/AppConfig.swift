@@ -1,9 +1,9 @@
 import SwiftUI
 
 enum AppConfig {
-    enum Grid {
-        static let columns = [GridItem(.adaptive(minimum: 300), spacing: 16)]
-        static let spacing: CGFloat = 16
+
+    enum Spacing {
+        static let spacer: CGFloat = 16
     }
     
     enum Layout {
@@ -18,6 +18,8 @@ enum AppConfig {
         static let vertical: CGFloat = 20
         static let card: CGFloat = 20
         static let spacer: CGFloat = 5
+        static let header: CGFloat = 6
+        static let text: CGFloat = 8
     }
     
     enum Colors {
