@@ -17,51 +17,50 @@ struct ContentView: View {
     // environment manages object context through core data, collection view model, active sheet        
     @Environment(\.managedObjectContext) private var viewContext
     @StateObject private var collectionViewModel: CollectionViewModel
-    @State private var activeSheet: ActiveSheet?
+    @StateObject private var sheetManager: SheetManager
 
-    // MARK: - Types
-    // active sheet enum for activating addCollection and quickAddThought views 
-    private enum ActiveSheet: Identifiable {
-        case addCollection
-        case quickAddThought
-        var id: Int {
-            switch self {
-            case .addCollection: return 0
-            case .quickAddThought: return 1
-            }
-        }
-    }
-    
-    // MARK: - Constants
-    // grid columns
-    private let gridColumns = [GridItem(.adaptive(minimum: 300), spacing: 16)]
-    
     // MARK: - Initialization
     // initializes the content view through the collection view model and the persistence controller
     init() {
-        _collectionViewModel = StateObject(wrappedValue: CollectionViewModel(viewContext: PersistenceController.shared.container.viewContext))
+        let viewContext = PersistenceController.shared.container.viewContext
+        _collectionViewModel = StateObject(wrappedValue: CollectionViewModel(viewContext: viewContext))
+        _sheetManager = StateObject(wrappedValue: SheetManager())
     }
     
     // MARK: - Body
     // body is the main view of the content view
     var body: some View {
         NavigationView {
-            VStack {
-                titleView
-                collectionsGridView
+            ScrollView {
+                LazyVStack(spacing: AppConfig.Grid.spacing) {
+                    ForEach(collectionViewModel.collections, id: \.id) { collection in
+                        NavigationLink {
+                            CollectionDetailView(
+                                viewContext: viewContext,
+                                collectionViewModel: collectionViewModel,
+                                collection: collection,
+                                formatter: DateFormatterManager.shared.dateFormatter
+                            )
+                        } label: {
+                            CollectionCardView(collection: collection)
+                        }
+                    }
+                }
             }
-            .toolbar { toolbarContent }
+            .buttonStyle(PlainButtonStyle())
+            .padding(.horizontal, AppConfig.Padding.horizontal)
+            .padding(.vertical, AppConfig.Padding.vertical)
+            .toolbar { toolbar }
             .overlay(quickAddButton, alignment: .bottomTrailing)
         }
-        .sheet(item: $activeSheet) { sheet in
-            switch sheet {
-            case .addCollection:
-                AddCollectionView(viewModel: collectionViewModel)
-            case .quickAddThought:
-                QuickAddThoughtView(collectionViewModel: collectionViewModel, viewContext: viewContext)
-            }
+        .sheet(item: $sheetManager.activeSheet) { sheetType in
+            SheetViewBuilder(
+                sheetType: sheetType,
+                collectionViewModel: collectionViewModel,
+                viewContext: viewContext
+            )
         }
-        .onChange(of: activeSheet) { oldValue, newValue in
+        .onChange(of: sheetManager.activeSheet) { oldValue, newValue in
             if newValue == nil {
                 collectionViewModel.fetchCollections()
             }
@@ -70,62 +69,21 @@ struct ContentView: View {
             collectionViewModel.updateContext(viewContext)
         }
     }
-    
-    // title of the content view
-    private var titleView: some View {
-        Text("🪡💭")
-            .font(.largeTitle)
-            .fontWeight(.bold)
-            .frame(maxWidth: .infinity, alignment: .center)
-            .padding(.horizontal, AppConfig.Padding.horizontal)
-            .padding(.top)
-    }
-
-    // grid of collections
-    private var collectionsGridView: some View {
-        ScrollView {
-            LazyVGrid(columns: AppConfig.Grid.columns, spacing: AppConfig.Grid.spacing) {
-                ForEach(collectionViewModel.collections, id: \.id) { collection in
-                    NavigationLink {
-                        CollectionDetailView(
-                            viewContext: viewContext,
-                            collectionViewModel: collectionViewModel,
-                            collection: collection,
-                            formatter: DateFormatterManager.shared.dateFormatter
-                        )
-                    } label: {
-                        CollectionCardView(collection: collection)
-                    }
-                    .buttonStyle(PlainButtonStyle())
-                    .contextMenu {
-                        Button(role: .destructive) {
-                            collectionViewModel.deleteCollection(collection)
-                        } label: {
-                            Label("Delete", systemImage: "trash")
-                        }
-                    }
-                }
-            }
-            .padding(AppConfig.Padding.grid)
-        }
-        .padding(.bottom, AppConfig.Padding.vertical)
-    }
 
     // card view of the collection
     private struct CollectionCardView: View {
         let collection: Collection
-
         var body: some View {
             VStack(alignment: .leading) {
                 Text(collection.name ?? "Unnamed Collection")
                     .font(.headline)
-                    .padding(.bottom, 4)
+                    .padding(.bottom, 8)
                 if let summary = collection.summary, !summary.isEmpty {
                     Text(summary)
                         .font(.subheadline)
                         .foregroundColor(.secondary)
                         .lineLimit(2)
-                        .padding(.bottom, 4)
+                        .padding(.bottom, 8)
                 }
                 HStack {
                     if let threads = collection.threads?.allObjects as? [Thread] {
@@ -136,9 +94,10 @@ struct ContentView: View {
                     Spacer()
                 }
             }
-            .padding()
+            .padding(16)
+            .frame(minHeight: 120)
             .background(
-                RoundedRectangle(cornerRadius: 12)
+                RoundedRectangle(cornerRadius: 25)
                     .fill(Color(.systemBackground))
                     .shadow(color: Color.black.opacity(0.1), radius: 5, x: 0, y: 2)
             )
@@ -147,9 +106,9 @@ struct ContentView: View {
 
     // toolbar content is the toolbar of the content view
     @ToolbarContentBuilder
-    private var toolbarContent: some ToolbarContent {
+    private var toolbar: some ToolbarContent {
         ToolbarItem(placement: .navigationBarTrailing) {
-            Button(action: { activeSheet = .addCollection }) {
+            Button(action: { sheetManager.present(.addCollection) }) {
                 Label("Add Collection", systemImage: "plus")
             }
         }
@@ -157,7 +116,7 @@ struct ContentView: View {
 
     // quick add button is the button to add a new thought to the selected collection
     private var quickAddButton: some View {
-        Button(action: { activeSheet = .quickAddThought }) {
+        Button(action: { sheetManager.present(.quickAddThought) }) {
             Image(systemName: "pencil.circle.fill")
                 .font(.system(size: AppConfig.Layout.quickAddButtonSize)) 
                 .foregroundColor(AppConfig.Colors.threadCount)
