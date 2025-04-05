@@ -48,8 +48,6 @@ struct ContentView: View {
                 }
             }
             .buttonStyle(PlainButtonStyle())
-            .padding(.horizontal, AppConfig.Padding.horizontal)
-            .padding(.vertical, AppConfig.Padding.vertical)
             .toolbar { toolbar }
             .overlay(quickAddButton, alignment: .bottomTrailing)
         }

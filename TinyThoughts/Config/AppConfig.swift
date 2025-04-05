@@ -16,7 +16,8 @@ enum AppConfig {
     enum Padding {
         static let horizontal: CGFloat = 20
         static let vertical: CGFloat = 20
-        static let card: CGFloat = 16
+        static let card: CGFloat = 20
+        static let spacer: CGFloat = 5
     }
     
     enum Colors {

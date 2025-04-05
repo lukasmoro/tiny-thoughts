@@ -34,12 +34,12 @@ struct CollectionCardView: View {
                 Spacer()
             }
         }
-        .padding(16)
-        .frame(minHeight: 120)
-        .background(
-            RoundedRectangle(cornerRadius: 25)
-                .fill(Color(.systemBackground))
-                .shadow(color: Color.black.opacity(0.1), radius: 5, x: 0, y: 2)
-        )
+        .padding(AppConfig.Padding.card)
+        .frame(minHeight: 140)
+        .background(Color(.systemBackground))
+        .clipShape(RoundedRectangle(cornerRadius: 25))
+        .shadow(color: Color.black.opacity(0.1), radius: 5, x: 0, y: 2)
+        .padding(.horizontal, AppConfig.Padding.horizontal)
+        .padding(.top, AppConfig.Padding.spacer)
     }
 }
