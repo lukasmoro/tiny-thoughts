@@ -2,7 +2,9 @@
 //  ThoughtDetailView.swift
 //  TinyThoughts
 //
-//  View for displaying and editing a thought
+//  created for tiny software by lukas moro
+//
+//  thought detail view used for displaying and editing a thought in the thread detail view
 //
 
 import SwiftUI

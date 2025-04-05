@@ -2,7 +2,9 @@
 //  ThreadDetailView.swift
 //  TinyThoughts
 //
-//  View for displaying and editing a thread
+//  created for tiny software by lukas moro
+//
+//  thread detail view used for displaying and editing a thread in the collection detail view
 //
 
 import SwiftUI

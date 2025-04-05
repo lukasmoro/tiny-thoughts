@@ -2,7 +2,9 @@
 //  AddThreadView.swift
 //  TinyThoughts
 //
-//  View for adding a new thread (when pressing the + button in the CollectionDetailView)
+//  created for tiny software by lukas moro
+//
+//  add thread view used for adding new threads from the collection detail view through the sheet manager
 //
 
 import SwiftUI

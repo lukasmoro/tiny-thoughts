@@ -2,7 +2,9 @@
 //  ThreadListView.swift
 //  TinyThoughts
 //
-//  Component for displaying a list of threads
+//  created for tiny software by lukas moro
+//
+//  thread list view used for displaying a list of threads in the thread detail view
 //
 
 import SwiftUI

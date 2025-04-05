@@ -1,3 +1,12 @@
+//
+//  AddButtonView.swift
+//  TinyThoughts
+//
+//  created for tiny software by lukas moro
+//
+//  add button used for adding new threads and thoughts
+//
+
 import SwiftUI
 
 struct AddButtonView: View {

@@ -2,7 +2,9 @@
 //  CollectionHeaderView.swift
 //  TinyThoughts
 //
-//  Component for displaying and editing a collection header
+//  created for tiny software by lukas moro
+//
+//  collection header view used for displaying and editing a collection header in the collection detail view
 //
 
 import SwiftUI

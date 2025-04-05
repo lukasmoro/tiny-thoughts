@@ -2,7 +2,9 @@
 //  ThreadView.swift
 //  TinyThoughts
 //
-//  View for displaying a thread, left column
+//  created for tiny software by lukas moro
+//
+//  thread view used for displaying a thread in the thread list view
 //
 
 import SwiftUI

@@ -2,7 +2,9 @@
 //  ThreadHeaderView.swift
 //  TinyThoughts
 //
-//  Component for displaying and editing a thread header
+//  created for tiny software by lukas moro
+//
+//  thread header view used for displaying and editing a thread header in the thread detail view
 //
 
 import SwiftUI

@@ -39,6 +39,8 @@ struct CollectionDetailView: View {
     // MARK: - Thought State
     @State private var showingAddThought = false
     
+    // MARK: - Initialization
+    // initializes the collection detail view with the collection view model, collection, and formatter
     init(viewContext: NSManagedObjectContext, collectionViewModel: CollectionViewModel, collection: Collection, formatter: DateFormatter) {
         self.collectionViewModel = collectionViewModel
         self.collection = collection
@@ -56,7 +58,14 @@ struct CollectionDetailView: View {
                 editState: $collectionEditState
             )
             Divider()
-            threadContentView
+            ThreadContentView(
+                threadViewModel: threadViewModel,
+                thoughtViewModel: thoughtViewModel,
+                selectedThread: $selectedThread,
+                showingAddThread: $showingAddThread,
+                showingAddThought: $showingAddThought,
+                formatter: formatter
+            )
         }
         .sheet(isPresented: $showingAddThread) {
             AddThreadView(viewModel: threadViewModel, collection: collection)
@@ -92,54 +101,6 @@ struct CollectionDetailView: View {
             if !newValue && selectedThread != nil {
                 threadViewModel.fetchThreads()
                 thoughtViewModel.fetchThoughts()
-            }
-        }
-    }
-    
-    // MARK: - Thread Content View
-    private var threadContentView: some View {
-        HStack(spacing: 0) {
-            threadDetailView
-            Divider()
-            VStack {
-                ThreadListView(
-                    threadViewModel: threadViewModel,
-                    thoughtViewModel: thoughtViewModel,
-                    selectedThread: $selectedThread,
-                    showingAddThread: $showingAddThread,
-                    formatter: formatter
-                )
-            }
-            .frame(width: UIScreen.main.bounds.width * 0.35)
-        }
-    }
-    
-    // MARK: - Thread Detail View
-    private var threadDetailView: some View {
-        VStack {
-            if let thread = selectedThread {
-                ThreadHeaderView(
-                    thread: thread,
-                    formatter: formatter,
-                    threadViewModel: threadViewModel,
-                    isEditing: $threadEditState.isEditing,
-                    editedTitle: $editedThreadTitle,
-                    editedSummary: $editedThreadSummary
-                )
-                Divider()
-                ThoughtsContentView(
-                    thoughtViewModel: thoughtViewModel,
-                    showingAddThought: $showingAddThought,
-                    thread: thread
-                )
-            } else {
-                VStack {
-                    Spacer()
-                    Text("Select a thread to view thoughts")
-                        .font(.headline)
-                        .foregroundColor(.gray)
-                    Spacer()
-                }
             }
         }
     }

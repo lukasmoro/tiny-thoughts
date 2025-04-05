@@ -1,3 +1,12 @@
+//
+//  EmptyStateView.swift
+//  TinyThoughts
+//
+//  created for tiny software by lukas moro
+//
+//  empty state view used for displaying an empty state in the content view, collection detail view and thread detail view
+//
+
 import SwiftUI
 
 struct EmptyStateView: View {

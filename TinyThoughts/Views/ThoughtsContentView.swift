@@ -2,7 +2,9 @@
 //  ThoughtsContentView.swift
 //  TinyThoughts
 //
-//  Component for displaying a list of thoughts
+//  created for tiny software by lukas moro
+//
+//  thoughts content view used for displaying thoughts in the thread content view
 //
 
 import SwiftUI
